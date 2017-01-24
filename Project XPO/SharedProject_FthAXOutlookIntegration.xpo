@@ -1,0 +1,3371 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : SysEmailSMTPPassword unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #SysEmailSMTPPassword
+    EnforceFKRelation 0
+    PROPERTIES
+      Name                #SysEmailSMTPPassword
+      Label               #@SYS99530
+      TitleField1         #AOSId
+      TitleField2         #InstanceName
+      SecurityKey         #AdminTables
+      SaveDataPerCompany  #No
+      PrimaryIndex        #serverIdx
+      ClusterIndex        #serverIdx
+      DeveloperDocumentation  #@SYS124641
+      Origin              #{2C1402D2-0000-1000-A128-2C9D7AF0672D}
+      LegacyId            #722
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #AOSId
+        STRING
+        PROPERTIES
+          Name                #AOSId
+          Table               #SysEmailSMTPPassword
+          Origin              #{CA6E0031-AB46-42CF-A4C4-12F9A42C97A2}
+          LegacyId            #4
+          ExtendedDataType    #AOSId
+          StringSize          #255
+        ENDPROPERTIES
+        
+      FIELD #EWSPassword
+        QUEUE
+        PROPERTIES
+          Name                #EWSPassword
+          Label               #@FTH520
+          HelpText            #@FTH521
+          Table               #SysEmailSMTPPassword
+          Origin              #{C3EDB221-2AB4-419C-81A1-B0C6D683BCA6}
+          ExtendedDataType    #CryptoBlob
+        ENDPROPERTIES
+        
+      FIELD #InstanceName
+        STRING
+        PROPERTIES
+          Name                #InstanceName
+          Table               #SysEmailSMTPPassword
+          Origin              #{FE3DBACF-F850-433D-9E23-972126E6D971}
+          LegacyId            #6
+          ExtendedDataType    #AOSInstanceId
+          StringSize          #255
+        ENDPROPERTIES
+        
+      FIELD #Password
+        QUEUE
+        PROPERTIES
+          Name                #Password
+          Label               #@SYS99527
+          HelpText            #@SYS99528
+          Table               #SysEmailSMTPPassword
+          Origin              #{C2D0ABB6-6C5E-4B87-BFDC-B08E5B2BAFD0}
+          LegacyId            #5
+          ExtendedDataType    #CryptoBlob
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+      GROUP #AutoReport
+        PROPERTIES
+          Name                #AutoReport
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #AOSId
+          #InstanceName
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #AOSInstance
+        PROPERTIES
+          Name                #AOSInstance
+          Label               #@SYS99526
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #InstanceName
+          #AOSId
+          #Password
+        ENDGROUPFIELDS
+      ENDGROUP
+    ENDGROUPS
+    
+    INDICES
+      #serverIdx
+      PROPERTIES
+        Name                #serverIdx
+        AllowDuplicates     #No
+        Origin              #{2B090001-02D2-1000-1BBA-847665724964}
+        LegacyId            #1
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #AOSId
+      ENDINDEXFIELDS
+      
+    ENDINDICES
+    FULLTEXTINDICES
+    ENDFULLTEXTINDICES
+    REFERENCES
+    ENDREFERENCES
+    
+    DELETEACTIONS
+    ENDDELETEACTIONS
+    
+    METHODS
+      SOURCE #currentAOSInstance
+        #public static server container currentAOSInstance()
+        #{
+        #    SysClientSessions clientSessions;
+        #    SysServerSessions serverSessions;
+        #    int serverId;
+        #
+        #    xSession currentSession = new xSession();
+        #    SysDictClass dictClass = new SysDictClass(classnum(xSession));
+        #
+        #    SkipAOSValidationPermission skipAos = new SkipAOSValidationPermission();
+        #    ExecutePermission executePerm = new ExecutePermission();
+        #    ;
+        #
+        #    select ServerId from clientSessions where clientSessions.SessionId == sessionid();
+        #    if (clientSessions)
+        #    {
+        #        serverId = clientSessions.ServerId;
+        #    }
+        #    else
+        #    {
+        #        if (dictClass.hasObjectMethod('serverId'))
+        #        {
+        #            executePerm.assert();
+        #            serverId = dictClass.callObject('serverId', currentSession);
+        #            CodeAccessPermission::revertAssert();
+        #        }
+        #    }
+        #
+        #    skipAos.assert();
+        #    serverSessions.skipAosValidation(true);
+        #    select AOSId, Instance_Name from serverSessions where serverSessions.ServerId == serverId;
+        #
+        #    return [serverSessions.AOSId, serverSessions.Instance_Name];
+        #}
+      ENDSOURCE
+      SOURCE #exist
+        #public static boolean exist( AOSId     _AOSId, AOSInstanceId  _AOSInstanceId)
+        #{
+        #    return (select RecId from sysEmailSMTPPassword
+        #        index hint serverIdx
+        #        where sysEmailSMTPPassword.AOSId == _AOSId &&
+        #              sysEmailSMTPPassword.InstanceName == _AOSInstanceId
+        #            ).RecId != 0;
+        #
+        #}
+        #
+      ENDSOURCE
+      SOURCE #find
+        #public static SysEmailSMTPPassword find(
+        #    AOSId     _AOSId,
+        #    AOSInstanceId  _AOSInstanceId,
+        #    boolean     _update = false)
+        #{
+        #    SysEmailSMTPPassword smtpPassword;
+        #    ;
+        #
+        #    if (_AOSId && _AOSInstanceId)
+        #    {
+        #        smtpPassword.selectForUpdate(_update);
+        #
+        #        select firstonly smtpPassword
+        #            index serverIdx
+        #            where smtpPassword.AOSId == _AOSId &&
+        #                  smtpPassword.InstanceName == _AOSInstanceId;
+        #    }
+        #
+        #    return smtpPassword;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : SysOutgoingEmailTable unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #SysOutgoingEmailTable
+    EnforceFKRelation 0
+    PROPERTIES
+      Name                #SysOutgoingEmailTable
+      Label               #@SYS93332
+      TitleField1         #EmailItemId
+      TitleField2         #Subject
+      SecurityKey         #AdminTables
+      CacheLookup         #NotInTTS
+      CreateRecIdIndex    #Yes
+      SaveDataPerCompany  #No
+      TableGroup          #Transaction
+      PrimaryIndex        #EmailIdx
+      ClusterIndex        #EmailIdx
+      CreatedDateTime     #Yes
+      DEL_createdTime     #Yes
+      DeveloperDocumentation  #@SYS124624
+      Origin              #{2C1500D5-0000-1000-422D-62CEC3DE6BEC}
+      LegacyId            #213
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #EmailItemId
+        INT64
+        PROPERTIES
+          Name                #EmailItemId
+          Mandatory           #Yes
+          AllowEditOnCreate   #No
+          AllowEdit           #No
+          Table               #SysOutgoingEmailTable
+          Origin              #{4BF13D57-67D3-494F-BC7A-8E3013EB4B49}
+          LegacyId            #28
+          ExtendedDataType    #SysEmailItemId
+        ENDPROPERTIES
+        
+      FIELD #IsOutlookInvite
+        ENUM
+        PROPERTIES
+          Name                #IsOutlookInvite
+          HelpText            #@FTH524
+          Table               #SysOutgoingEmailTable
+          Origin              #{F28D3275-5EEE-4886-A67F-8C52A42D6335}
+          ExtendedDataType    #NoYesId
+          EnumType            #NoYes
+        ENDPROPERTIES
+        
+      FIELD #IsSystemEmail
+        ENUM
+        PROPERTIES
+          Name                #IsSystemEmail
+          HelpText            #@SYS136220
+          Table               #SysOutgoingEmailTable
+          Origin              #{6166C66F-908F-4B90-A56F-330BBD9BFDC9}
+          LegacyId            #35
+          ExtendedDataType    #NoYesId
+          EnumType            #NoYes
+        ENDPROPERTIES
+        
+      FIELD #LatestStatusChangeDateTime
+        DATETIME
+        PROPERTIES
+          Name                #LatestStatusChangeDateTime
+          Table               #SysOutgoingEmailTable
+          Origin              #{98E2C6CB-FDDD-4D1A-9C3F-99044B6A4C97}
+          LegacyId            #4
+          ExtendedDataType    #SysStatusChangeDateTime
+        ENDPROPERTIES
+        
+      FIELD #Message
+        STRING
+        PROPERTIES
+          Name                #Message
+          Table               #SysOutgoingEmailTable
+          Origin              #{F06D591A-1730-4FB4-B705-A4B1CFC513F9}
+          LegacyId            #9
+          ExtendedDataType    #SysEmailContents
+          StringSize          #(Memo)
+        ENDPROPERTIES
+        
+      FIELD #NextRetryDateTime
+        DATETIME
+        PROPERTIES
+          Name                #NextRetryDateTime
+          Table               #SysOutgoingEmailTable
+          Origin              #{145C9BA4-8F25-4831-84B5-C715757D0BFD}
+          LegacyId            #5
+          ExtendedDataType    #SysRetryDateTime
+        ENDPROPERTIES
+        
+      FIELD #Origin
+        STRING
+        PROPERTIES
+          Name                #Origin
+          Table               #SysOutgoingEmailTable
+          Origin              #{267EBD67-C5F1-400E-93B6-B35AD5C5D0FD}
+          LegacyId            #36
+          ExtendedDataType    #SysEmailDescriptionType
+          StringSize          #32
+        ENDPROPERTIES
+        
+      FIELD #Priority
+        ENUM
+        PROPERTIES
+          Name                #Priority
+          HelpText            #@SYS74349
+          Table               #SysOutgoingEmailTable
+          Origin              #{822D0B6B-0ACE-4348-99F5-BCE3DF07DCC0}
+          LegacyId            #11
+          EnumType            #eMailPriority
+        ENDPROPERTIES
+        
+      FIELD #ProcessorID
+        GUID
+        PROPERTIES
+          Name                #ProcessorID
+          Table               #SysOutgoingEmailTable
+          Origin              #{1C68E1F5-1191-43C6-A04A-220114BD472A}
+          LegacyId            #32
+          ExtendedDataType    #SysEmailProcessorId
+        ENDPROPERTIES
+        
+      FIELD #Recipient
+        STRING
+        PROPERTIES
+          Name                #Recipient
+          Mandatory           #Yes
+          Table               #SysOutgoingEmailTable
+          Origin              #{A8F79D4B-CA14-4E4A-8537-C94151521489}
+          LegacyId            #13
+          ExtendedDataType    #SysEmailRecipients
+          StringSize          #255
+        ENDPROPERTIES
+        
+      FIELD #RetryNum
+        INT
+        PROPERTIES
+          Name                #RetryNum
+          Table               #SysOutgoingEmailTable
+          Origin              #{66A71493-3108-4D45-A010-6D8CCE34407E}
+          LegacyId            #10
+          ExtendedDataType    #SysEmailRetryNum
+        ENDPROPERTIES
+        
+      FIELD #Sender
+        STRING
+        PROPERTIES
+          Name                #Sender
+          Mandatory           #Yes
+          Table               #SysOutgoingEmailTable
+          Origin              #{D454866A-798C-4D85-9A2D-7569839E4A00}
+          LegacyId            #12
+          ExtendedDataType    #Email
+          StringSize          #80
+        ENDPROPERTIES
+        
+      FIELD #SenderName
+        STRING
+        PROPERTIES
+          Name                #SenderName
+          Table               #SysOutgoingEmailTable
+          Origin              #{E214AAB0-B2D8-4111-9735-8E587F96A24C}
+          LegacyId            #34
+          ExtendedDataType    #Name
+          StringSize          #60
+        ENDPROPERTIES
+        
+      FIELD #SessionId
+        INT
+        PROPERTIES
+          Name                #SessionId
+          Table               #SysOutgoingEmailTable
+          Origin              #{64430603-6748-49E3-BB60-341B78CD4454}
+          LegacyId            #29
+          ExtendedDataType    #SessionId
+        ENDPROPERTIES
+        
+      FIELD #SessionLoginDateTime
+        DATETIME
+        PROPERTIES
+          Name                #SessionLoginDateTime
+          Table               #SysOutgoingEmailTable
+          Origin              #{09D1813A-A112-42B1-B788-F0BB1860D04A}
+          LegacyId            #6
+          ExtendedDataType    #SysSessionLoginDateTime
+        ENDPROPERTIES
+        
+      FIELD #Status
+        ENUM
+        PROPERTIES
+          Name                #Status
+          Mandatory           #Yes
+          Table               #SysOutgoingEmailTable
+          Origin              #{2588BAC4-D059-43EC-8273-B9C9700CC177}
+          LegacyId            #7
+          EnumType            #SysEmailStatus
+        ENDPROPERTIES
+        
+      FIELD #Subject
+        STRING
+        PROPERTIES
+          Name                #Subject
+          Table               #SysOutgoingEmailTable
+          Origin              #{6E695969-6CC4-4C4F-97A9-72BD110D2AB9}
+          LegacyId            #8
+          ExtendedDataType    #SysEmailSubject
+          StringSize          #128
+        ENDPROPERTIES
+        
+      FIELD #TemplateId
+        STRING
+        PROPERTIES
+          Name                #TemplateId
+          Table               #SysOutgoingEmailTable
+          Origin              #{F4E4D31F-95D7-4C74-96C7-15AF71CDC885}
+          LegacyId            #23
+          ExtendedDataType    #SysEmailId
+        ENDPROPERTIES
+        
+      FIELD #UserId
+        STRING
+        PROPERTIES
+          Name                #UserId
+          Mandatory           #Yes
+          Table               #SysOutgoingEmailTable
+          Origin              #{50F77768-0F13-4CF4-AC0D-C9909A58F85A}
+          LegacyId            #21
+          ExtendedDataType    #UserId
+          StringSize          #8
+        ENDPROPERTIES
+        
+      FIELD #WithRetries
+        ENUM
+        PROPERTIES
+          Name                #WithRetries
+          HelpText            #@SYS136221
+          Table               #SysOutgoingEmailTable
+          Origin              #{BA3AA345-E74E-48F1-8A6A-A3D9E9C013CD}
+          LegacyId            #18
+          ExtendedDataType    #NoYesId
+          EnumType            #NoYes
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+      GROUP #AutoReport
+        PROPERTIES
+          Name                #AutoReport
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #EmailItemId
+          #Sender
+          #Recipient
+          #Subject
+          #UserId
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #AutoLookup
+        PROPERTIES
+          Name                #AutoLookup
+          Label               #@SYS7115
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Identification
+        PROPERTIES
+          Name                #Identification
+          Label               #@SYS53631
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #UserId
+          #EmailItemId
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Message
+        PROPERTIES
+          Name                #Message
+          Label               #@SYS60279
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Sender
+          #SenderName
+          #Recipient
+          #Subject
+          #Message
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Properties
+        PROPERTIES
+          Name                #Properties
+          Label               #@SYS10344
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Priority
+          #WithRetries
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #SendStatus
+        PROPERTIES
+          Name                #SendStatus
+          Label               #@SYS93334
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #Status
+          #RetryNum
+          #NextRetryDateTime
+          #LatestStatusChangeDateTime
+          #SessionLoginDateTime
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Session
+        PROPERTIES
+          Name                #Session
+          Label               #@SYS7115
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #SessionId
+          #SessionLoginDateTime
+          #ProcessorID
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Template
+        PROPERTIES
+          Name                #Template
+          Label               #@SYS37801
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #TemplateId
+          #IsSystemEmail
+          #Origin
+        ENDGROUPFIELDS
+      ENDGROUP
+    ENDGROUPS
+    
+    INDICES
+      #EmailIdx
+      PROPERTIES
+        Name                #EmailIdx
+        AllowDuplicates     #No
+        Origin              #{2B080001-00D5-1000-456D-61696C496478}
+        LegacyId            #1
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #EmailItemId
+      ENDINDEXFIELDS
+      
+      #StatusIdx
+      PROPERTIES
+        Name                #StatusIdx
+        AllowDuplicates     #No
+        Origin              #{2B090002-00D5-1000-FBC8-737475734964}
+        LegacyId            #2
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #Status
+        #EmailItemId
+      ENDINDEXFIELDS
+      
+    ENDINDICES
+    FULLTEXTINDICES
+    ENDFULLTEXTINDICES
+    REFERENCES
+      REFERENCE #SysEmailTable
+        PROPERTIES
+          Name                #SysEmailTable
+          Table               #SysEmailTable
+          RelatedTableCardinality   #ZeroOne
+          Cardinality         #ZeroMore
+          RelationshipType    #Association
+          UseDefaultRoleNames #Yes
+        ENDPROPERTIES
+        
+        FIELDREFERENCES
+          REFERENCETYPE NORMAL
+          PROPERTIES
+            Field               #TemplateId
+            RelatedField        #EmailId
+            SourceEDT           #SysEmailId
+          ENDPROPERTIES
+          
+        ENDFIELDREFERENCES
+      ENDREFERENCE
+      REFERENCE #UserInfo
+        PROPERTIES
+          Name                #UserInfo
+          Table               #UserInfo
+          RelatedTableCardinality   #ExactlyOne
+          Cardinality         #ZeroMore
+          RelationshipType    #Aggregation
+          RelatedTableRole    #UserInfo
+          Role                #SysOutgoingEmailTable
+          EDTRelation         #Yes
+        ENDPROPERTIES
+        
+        FIELDREFERENCES
+          REFERENCETYPE PKFK
+          PROPERTIES
+            Field               #UserId
+            RelatedField        #id
+            SourceEDT           #UserId
+          ENDPROPERTIES
+          
+        ENDFIELDREFERENCES
+      ENDREFERENCE
+    ENDREFERENCES
+    
+    DELETEACTIONS
+      #SysOutgoingEmailData
+      PROPERTIES
+        Table               #SysOutgoingEmailData
+        DeleteAction        #Cascade
+      ENDPROPERTIES
+      
+    ENDDELETEACTIONS
+    
+    METHODS
+      SOURCE #getStatusInfoDetails
+        #//BP Deviation Documented
+        #display SysEmailStatusInfoDetails getStatusInfoDetails()
+        #{
+        #    ;
+        #
+        #
+        #    switch (this.Status)
+        #    {
+        #        case SysEmailStatus::Failed:
+        #        case SysEmailStatus::Sent:
+        #            return enum2str(this.Status);
+        #
+        #        case SysEmailStatus::Unsent:
+        #        case SysEmailStatus::SendAttempted:
+        #        case SysEmailStatus::Executing:
+        #            return strFmt("%1 (%2)", enum2str(SysEmailStatus::SendAttempted),int2str(this.RetryNum));
+        #    }
+        #
+        #    return '';
+        #
+        #}
+      ENDSOURCE
+      SOURCE #initValue
+        #public void initValue()
+        #{
+        #    SysOutgoingEmailTable SysOutgoingEmailTable;
+        #
+        #    select reverse SysOutgoingEmailTable;
+        #    this.EmailItemId = SysOutgoingEmailTable.EmailItemId+1;
+        #    super();
+        #}
+      ENDSOURCE
+      SOURCE #exist
+        #static boolean exist(SysEmailItemId _emailItemId)
+        #{
+        #    return _emailItemId && (select RecId from sysOutgoingEmailTable
+        #        index hint EmailIdx
+        #        where sysOutgoingEmailTable.EmailItemId == _emailItemId
+        #        ).RecId != 0;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #find
+        #static SysOutgoingEmailTable find(SysEmailItemId _emailItemId,
+        #                                  boolean _forupdate = false,
+        #                                  ConcurrencyModel _concurrencyModel = ConcurrencyModel::Auto)
+        #{
+        #    SysOutgoingEmailTable outgoingEmailTable;
+        #    ;
+        #
+        #    if (_emailItemId)
+        #    {
+        #        if (_forupdate)
+        #        {
+        #            outgoingEmailTable.selectForUpdate(_forupdate);
+        #            if (_concurrencyModel != ConcurrencyModel::Auto)
+        #                outgoingEmailTable.concurrencyModel(_concurrencyModel);
+        #        }
+        #
+        #        if ( _forupdate == true )
+        #        {
+        #            select forupdate outgoingEmailTable
+        #                where outgoingEmailTable.EmailItemId == _emailItemId;
+        #        }
+        #        else
+        #        {
+        #            select outgoingEmailTable
+        #                where outgoingEmailTable.EmailItemId == _emailItemId;
+        #        }
+        #    }
+        #
+        #    return outgoingEmailTable;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #markEmailAs
+        #server static void markEmailAs(SysEmailItemId _emailItemId,SysEmailStatus _emailStatus, boolean _increaseRetryCount = false)
+        #{
+        #    SysOutgoingEmailTable outgoingEmailTable;
+        #
+        #    ttsbegin;
+        #
+        #        select forupdate outgoingEmailTable
+        #            index hint EmailIdx
+        #            where outgoingEmailTable.EmailItemId == _emailItemId;
+        #
+        #        outgoingEmailTable.Status = _emailStatus;
+        #
+        #        if (_emailStatus != SysEmailStatus::Executing)
+        #        {
+        #            outgoingEmailTable.LatestStatusChangeDateTime = DateTimeUtil::getSystemDateTime();
+        #        }
+        #
+        #        if (_increaseRetryCount)
+        #            outgoingEmailTable.RetryNum = outgoingEmailTable.RetryNum + 1;
+        #
+        #        outgoingEmailTable.update();
+        #
+        #    ttscommit;
+        #}
+      ENDSOURCE
+      SOURCE #scheduleSendRetry
+        #server static void scheduleSendRetry(SysEmailItemId _emailItemId, utcdatetime _nextRetryDateTime)
+        #{
+        #    SysOutgoingEmailTable outgoingEmailTable;
+        #
+        #    ttsbegin;
+        #
+        #        select forupdate outgoingEmailTable
+        #            index hint EmailIdx
+        #            where outgoingEmailTable.EmailItemId == _emailItemId;
+        #
+        #        outgoingEmailTable.Status = SysEmailStatus::SendAttempted;
+        #
+        #        outgoingEmailTable.LatestStatusChangeDateTime = DateTimeUtil::getSystemDateTime();
+        #
+        #        outgoingEmailTable.NextRetryDateTime = _nextRetryDateTime;
+        #        outgoingEmailTable.RetryNum = outgoingEmailTable.RetryNum + 1;
+        #
+        #        outgoingEmailTable.update();
+        #
+        #    ttscommit;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : SysEmailParameters unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #SysEmailParameters
+    EnforceFKRelation 0
+    PROPERTIES
+      Name                #SysEmailParameters
+      Label               #@SYS77517
+      FormRef             #sysemailparameters
+      SecurityKey         #AdminTables
+      CacheLookup         #Found
+      CreateRecIdIndex    #Yes
+      SaveDataPerCompany  #No
+      TableGroup          #Parameter
+      PrimaryIndex        #key
+      ClusterIndex        #key
+      ModifiedDateTime    #Yes
+      DEL_modifiedTime    #Yes
+      ModifiedBy          #Yes
+      DeveloperDocumentation  #@SYS124670
+      Origin              #{2C120696-0000-1000-C977-F90ACFBD23DB}
+      LegacyId            #1686
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #AttachmentsPath
+        STRING
+        PROPERTIES
+          Name                #AttachmentsPath
+          Table               #SysEmailParameters
+          Origin              #{2A0F0001-0696-1000-DB7D-5E74E8812C5A}
+          LegacyId            #1
+          ExtendedDataType    #FilePath
+          StringSize          #259
+        ENDPROPERTIES
+        
+      FIELD #DNSServerName
+        STRING
+        PROPERTIES
+          Name                #DNSServerName
+          Visible             #No
+          Table               #SysEmailParameters
+          Origin              #{2A0D0007-0696-1000-4AF2-89AFC1F08565}
+          LegacyId            #7
+          ExtendedDataType    #DNSServerName
+          StringSize          #64
+        ENDPROPERTIES
+        
+      FIELD #DNSTCPIPRetryCount
+        INT
+        PROPERTIES
+          Name                #DNSTCPIPRetryCount
+          Visible             #No
+          Table               #SysEmailParameters
+          Origin              #{2A120008-0696-1000-8485-D23382EE4CA6}
+          LegacyId            #8
+          ExtendedDataType    #DNSTCPIPRetryCount
+        ENDPROPERTIES
+        
+      FIELD #DNSUDPRetryCount
+        INT
+        PROPERTIES
+          Name                #DNSUDPRetryCount
+          Visible             #No
+          Table               #SysEmailParameters
+          Origin              #{2A100009-0696-1000-800C-92F347A6DC80}
+          LegacyId            #9
+          ExtendedDataType    #DNSUDPRetryCount
+        ENDPROPERTIES
+        
+      FIELD #EmailConfirmation
+        ENUM
+        PROPERTIES
+          Name                #EmailConfirmation
+          Table               #SysEmailParameters
+          Origin              #{73AD904D-2F6E-454D-9938-BE617A7CEAC3}
+          EnumType            #EmailConfirmation
+        ENDPROPERTIES
+        
+      FIELD #EWSUsername
+        STRING
+        PROPERTIES
+          Name                #EWSUsername
+          Label               #@FTH518
+          HelpText            #@FTH519
+          Table               #SysEmailParameters
+          Origin              #{B7668479-E51D-447A-A95D-09476FFA1E3F}
+          ExtendedDataType    #SMTPUserName
+          StringSize          #64
+        ENDPROPERTIES
+        
+      FIELD #key
+        INT
+        PROPERTIES
+          Name                #key
+          AllowEditOnCreate   #No
+          AllowEdit           #No
+          Visible             #No
+          Table               #SysEmailParameters
+          Origin              #{2A03000A-0696-1000-6B65-790000000000}
+          LegacyId            #10
+          ExtendedDataType    #ParametersKey
+        ENDPROPERTIES
+        
+      FIELD #maxEmailAttachmentSize
+        INT
+        PROPERTIES
+          Name                #maxEmailAttachmentSize
+          Table               #SysEmailParameters
+          Origin              #{2A16000B-0696-1000-E294-001DB6E15AD9}
+          LegacyId            #11
+          ExtendedDataType    #SysEmailAttachmentSize
+        ENDPROPERTIES
+        
+      FIELD #NTLM
+        ENUM
+        PROPERTIES
+          Name                #NTLM
+          Table               #SysEmailParameters
+          Origin              #{2A04000D-0696-1000-4E54-4C4D00000000}
+          LegacyId            #13
+          ExtendedDataType    #SysEmailNTLM
+          EnumType            #NoYes
+        ENDPROPERTIES
+        
+      FIELD #SMTPPortNumber
+        INT
+        PROPERTIES
+          Name                #SMTPPortNumber
+          Table               #SysEmailParameters
+          Origin              #{2A0E0003-0696-1000-8D8E-BE5E00F2EB85}
+          LegacyId            #3
+          ExtendedDataType    #SMTPPortNumber
+        ENDPROPERTIES
+        
+      FIELD #SMTPRelayServerName
+        STRING
+        PROPERTIES
+          Name                #SMTPRelayServerName
+          Table               #SysEmailParameters
+          Origin              #{2A130002-0696-1000-51DA-174F4D24F214}
+          LegacyId            #2
+          ExtendedDataType    #SMTPRelayServerName
+          StringSize          #128
+        ENDPROPERTIES
+        
+      FIELD #SMTPServerIPAddress
+        STRING
+        PROPERTIES
+          Name                #SMTPServerIPAddress
+          Table               #SysEmailParameters
+          Origin              #{2A130004-0696-1000-A14F-429B83EB4ED2}
+          LegacyId            #4
+          ExtendedDataType    #SMTPServerIPAddress
+          StringSize          #15
+        ENDPROPERTIES
+        
+      FIELD #SMTPUserName
+        STRING
+        PROPERTIES
+          Name                #SMTPUserName
+          Table               #SysEmailParameters
+          Origin              #{2A0C0005-0696-1000-8D72-B0ACD3826572}
+          LegacyId            #5
+          ExtendedDataType    #SMTPUserName
+          StringSize          #64
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+      GROUP #AutoReport
+        PROPERTIES
+          Name                #AutoReport
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #DNSServerName
+          #SMTPRelayServerName
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Attachment
+        PROPERTIES
+          Name                #Attachment
+          Label               #@SYS93335
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #maxEmailAttachmentSize
+          #AttachmentsPath
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #DNS
+        PROPERTIES
+          Name                #DNS
+          Label               #@SYS77530
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #DNSServerName
+          #DNSTCPIPRetryCount
+          #DNSUDPRetryCount
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #Outlook
+        PROPERTIES
+          Name                #Outlook
+          Label               #@SYS36382
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #EWSUsername
+        ENDGROUPFIELDS
+      ENDGROUP
+      GROUP #SMTP
+        PROPERTIES
+          Name                #SMTP
+          Label               #@SYS77099
+        ENDPROPERTIES
+        
+        GROUPFIELDS
+          #SMTPRelayServerName
+          #SMTPServerIPAddress
+          #SMTPPortNumber
+          #SMTPUserName
+          #NTLM
+        ENDGROUPFIELDS
+      ENDGROUP
+    ENDGROUPS
+    
+    INDICES
+      #key
+      PROPERTIES
+        Name                #key
+        AllowDuplicates     #No
+        Origin              #{2B030001-0696-1000-6B65-790000000000}
+        LegacyId            #1
+      ENDPROPERTIES
+      
+      INDEXFIELDS
+        #key
+      ENDINDEXFIELDS
+      
+    ENDINDICES
+    FULLTEXTINDICES
+    ENDFULLTEXTINDICES
+    REFERENCES
+    ENDREFERENCES
+    
+    DELETEACTIONS
+    ENDDELETEACTIONS
+    
+    METHODS
+      SOURCE #insert
+        #public void insert()
+        #{
+        #    this.SMTPPortNumber      = 25;
+        #    this.MaxEmailAttachmentSize = 10;
+        #    this.NTLM = false;
+        #
+        #    super();
+        #}
+      ENDSOURCE
+      SOURCE #EWSPassword
+        #/// <summary>
+        #/// Get EWS password for the AOS
+        #/// </summary>
+        #/// <returns>
+        #/// EWS password
+        #/// </returns>
+        #/// <remarks>
+        #/// Get EWS password on the basis of current AOS instance
+        #/// </remarks>
+        #
+        #public static SMTPPassword EWSPassword()
+        #{
+        #    CryptoBlob cryptoBlob = connull();
+        #    SysEmailSMTPPassword EWSPassword;
+        #
+        #    AOSId AOSId;
+        #    AOSInstanceId AOSInstanceId;
+        #
+        #    ;
+        #    [AOSId,AOSInstanceId] = SysEmailSMTPPassword::currentAOSInstance();
+        #
+        #    EWSPassword = SysEmailSMTPPassword::find(AOSId,AOSInstanceId);
+        #
+        #    if (EWSPassword.RecId != 0)
+        #        cryptoBlob = EWSPassword.EWSPassword;
+        #
+        #    if (cryptoBlob != connull())
+        #        return cryptoblob2str(WinapiServer::cryptUnProtectData(cryptoBlob));
+        #    else
+        #        return '';
+        #}
+      ENDSOURCE
+      SOURCE #find
+        #static SysEmailParameters find(boolean _forupdate = false)
+        #{
+        #    SysEmailParameters parameter;
+        #
+        #    parameter.selectForUpdate(_forupdate);
+        #    select firstonly parameter
+        #        index key
+        #        where parameter.Key == 0;
+        #
+        #    if (!parameter && !parameter.isTmp())
+        #    {
+        #        Company::createParameter(parameter);
+        #    }
+        #
+        #    return parameter;
+        #}
+      ENDSOURCE
+      SOURCE #password
+        #static SMTPPassword password()
+        #{
+        #    CryptoBlob cryptoBlob = connull();
+        #    SysEmailSMTPPassword SMTPPassword;
+        #
+        #    AOSId AOSId;
+        #    AOSInstanceId AOSInstanceId;
+        #
+        #    ;
+        #    [AOSId,AOSInstanceId] = SysEmailSMTPPassword::currentAOSInstance();
+        #
+        #    SMTPPassword = SysEmailSMTPPassword::find(AOSId,AOSInstanceId);
+        #
+        #    if (SMTPPassword.RecId != 0)
+        #        cryptoBlob = SMTPPassword.Password;
+        #
+        #    if (cryptoBlob != connull())
+        #        return cryptoblob2str(WinapiServer::cryptUnProtectData(cryptoBlob));
+        #    else
+        #        return '';
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: DBE
+
+; Microsoft Dynamics AX Enumtype : EmailConfirmation unloaded
+; --------------------------------------------------------------------------------
+  ENUMTYPEVERSION 1
+  
+  ENUMTYPE #EmailConfirmation
+    PROPERTIES
+      Name                #EmailConfirmation
+      Label               #@FTH642
+      Help                #@FTH643
+      UseEnumValue        #Yes
+      Origin              #{BFB4BAB9-E675-4581-B7EE-907DD192EF0A}
+    ENDPROPERTIES
+    
+    TYPEELEMENTS
+      #Email
+      PROPERTIES
+        Name                #Email
+        Label               #@FTH316
+        EnumValue           #0
+      ENDPROPERTIES
+      
+      #Calender
+      PROPERTIES
+        Name                #Calender
+        Label               #@FTH644
+        EnumValue           #1
+      ENDPROPERTIES
+      
+    ENDTYPEELEMENTS
+  ENDENUMTYPE
+  
+
+***Element: FRM
+
+; Microsoft Dynamics AX Forms unloaded
+; --------------------------------------------------------------------------------
+FRMVERSION 12
+
+FORM #SysEmailParameters
+  PROPERTIES
+    Name                #SysEmailParameters
+    Origin              #{0B120000-0000-1000-C977-F90ACFBD23DB}
+  ENDPROPERTIES
+  
+  METHODS
+    SOURCE #classDeclaration
+      #public class FormRun extends ObjectRun
+      #{
+      #    QueryBuildRange     qbdsAOSId;
+      #    QueryBuildRange     qbdsAOSInstanceId;
+      #}
+    ENDSOURCE
+    SOURCE #filePathLookupTitle
+      #str filePathLookupTitle()
+      #{
+      #    return "@SYS98435";
+      #}
+    ENDSOURCE
+    SOURCE #init
+      #public void init()
+      #{
+      #    super();
+      #    SysEmailParameters::find();
+      #}
+    ENDSOURCE
+  ENDMETHODS
+  OBJECTBANK
+    PROPERTIES
+    ENDPROPERTIES
+    
+    DATASOURCE
+      OBJECTPOOL
+        PROPERTIES
+          Name                #SysEmailParameters
+          Table               #SysEmailParameters
+        ENDPROPERTIES
+        
+        FIELDLIST
+        ENDFIELDLIST
+      ENDOBJECTPOOL
+      METHODS
+        SOURCE #executeQuery
+          #public void executeQuery()
+          #{
+          #    super();
+          #
+          #    SMTP_SMTPUserName.enabled(!sysEmailParameters.NTLM);
+          #    SMTP_Password.enabled(!sysEmailParameters.NTLM);
+          #}
+        ENDSOURCE
+      ENDMETHODS
+    ENDDATASOURCE
+    DATASOURCE
+      OBJECTPOOL
+        PROPERTIES
+          Name                #SysEmailSMTPPassword
+          Table               #SysEmailSMTPPassword
+        ENDPROPERTIES
+        
+        FIELDLIST
+        ENDFIELDLIST
+      ENDOBJECTPOOL
+      METHODS
+        SOURCE #setEWSPassword
+          #//BP Deviation Documented
+          #edit SMTPPassword setEWSPassword(boolean _set = false, SMTPPassword _pwd = '')
+          #{
+          #    CryptoBlob cryptoBlob = connull();
+          #    AOSId AOSId;
+          #    AOSInstanceId AOSInstanceId;
+          #;
+          #    if (_set && _pwd != 'xxxxxxxx')
+          #    {
+          #        cryptoBlob = WinapiServer::cryptProtectData(str2cryptoblob(_pwd));
+          #
+          #        if(sysEmailSMTPPassword.RecId == 0)
+          #        {
+          #            [AOSId, AOSInstanceId] = SysEmailSMTPPassword::currentAOSInstance();
+          #            sysEmailSMTPPassword.AOSId = AOSId;
+          #            sysEmailSMTPPassword.InstanceName = AOSInstanceId;
+          #            sysEmailSMTPPassword.EWSPassword = cryptoBlob;
+          #            sysEmailSMTPPAssword.insert();
+          #            this.executeQuery();
+          #        }
+          #        else
+          #        {
+          #            sysEmailSMTPPassword.EWSPassword = cryptoBlob;
+          #            sysEmailSMTPPassword.update();
+          #            sysEmailSMTPPassword.reread();
+          #        }
+          #}
+          #
+          #    if (sysEmailSMTPPassword && sysEmailSMTPPassword.EWSPassword != connull())
+          #    {
+          #        return 'xxxxxxxx';
+          #    }
+          #    else
+          #    {
+          #        return  '';
+          #    }
+          #}
+        ENDSOURCE
+        SOURCE #setPassword
+          #//BP Deviation Documented
+          #edit SMTPPassword setPassword(boolean _set = false, SMTPPassword _pwd = '')
+          #{
+          #    CryptoBlob cryptoBlob = connull();
+          #    AOSId AOSId;
+          #    AOSInstanceId AOSInstanceId;
+          #;
+          #    if (_set && _pwd != 'xxxxxxxx')
+          #    {
+          #        cryptoBlob = WinapiServer::cryptProtectData(str2cryptoblob(_pwd));
+          #
+          #        if(sysEmailSMTPPassword.RecId == 0)
+          #        {
+          #            [AOSId, AOSInstanceId] = SysEmailSMTPPassword::currentAOSInstance();
+          #            sysEmailSMTPPassword.AOSId = AOSId;
+          #            sysEmailSMTPPassword.InstanceName = AOSInstanceId;
+          #            sysEmailSMTPPassword.Password = cryptoBlob;
+          #            sysEmailSMTPPAssword.insert();
+          #            this.executeQuery();
+          #        }
+          #        else
+          #        {
+          #            sysEmailSMTPPassword.Password = cryptoBlob;
+          #            sysEmailSMTPPassword.update();
+          #            sysEmailSMTPPassword.reread();
+          #        }
+          #}
+          #
+          #    if (sysEmailSMTPPassword && sysEmailSMTPPassword.Password != connull())
+          #    {
+          #        return 'xxxxxxxx';
+          #    }
+          #    else
+          #    {
+          #        return  '';
+          #    }
+          #}
+        ENDSOURCE
+        SOURCE #executeQuery
+          #public void executeQuery()
+          #{
+          #    AOSId AOSId;
+          #    AOSInstanceId AOSInstanceId;
+          #
+          #    [AOSId, AOSInstanceId] = SysEmailSMTPPassword::currentAOSInstance();
+          #
+          #    qbdsAOSId.value(AOSId);
+          #    qbdsAOSInstanceId.value(AOSInstanceId);
+          #
+          #    super();
+          #
+          #    if (sysEmailSMTPPassword)
+          #        SMTP_Password.text('xxxxxxxx');
+          #}
+        ENDSOURCE
+        SOURCE #init
+          #public void init()
+          #{
+          #    super();
+          #
+          #    qbdsAOSId  = this.query().dataSourceNo(1).addRange(fieldnum(SysEmailSMTPPassword,AOSId));
+          #    qbdsAOSInstanceId =  this.query().dataSourceNo(1).addRange(fieldnum(SysEmailSMTPPassword,InstanceName));
+          #}
+        ENDSOURCE
+      ENDMETHODS
+    ENDDATASOURCE
+  ENDOBJECTBANK
+  
+  REFERENCEDATASOURCES
+  ENDREFERENCEDATASOURCES
+  
+  JOINS
+  ENDJOINS
+  
+  PARTREFERENCES
+  ENDPARTREFERENCES
+  
+  DESIGN
+    PROPERTIES
+      Caption             #@SYS77517
+      HideToolbar         #Yes
+      SetCompany          #No
+      StatusBarStyle      #Simple
+      ViewEditMode        #Edit
+    ENDPROPERTIES
+    
+    CONTAINER
+      CONTROL GROUP
+        PROPERTIES
+          Name                #Attachment
+          ElementPosition     #1610612734
+          HierarchyParent     #General
+          Caption             #@SYS96654
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #DNS
+          ElementPosition     #1288490187
+          HierarchyParent     #General
+          DataSource          #SysEmailParameters
+          DataGroup           #DNS
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #EWS
+          ElementPosition     #1932735281
+          HierarchyParent     #General
+          Caption             #@FTH522
+          DataSource          #SysEmailParameters
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #SMTP
+          ElementPosition     #858993458
+          HierarchyParent     #General
+          DataSource          #SysEmailParameters
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL TAB
+        PROPERTIES
+          Name                #Tab
+          ElementPosition     #1073741823
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL TABPAGE
+        PROPERTIES
+          Name                #General
+          ElementPosition     #1431655764
+          HierarchyParent     #Tab
+          Caption             #@SYS2952
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #SysEmailParameters_NTLM
+          ElementPosition     #1879048185
+          HierarchyParent     #SMTP
+          DataSource          #SysEmailParameters
+          DataField           #NTLM
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #public void clicked()
+            #{
+            #    super();
+            #
+            #    SMTP_SMTPUserName.enabled(!sysEmailParameters.NTLM);
+            #    SMTP_Password.enabled(!sysEmailParameters.NTLM);
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL COMBOBOX
+        PROPERTIES
+          Name                #SysEmailParameters_EmailConfirmation
+          ElementPosition     #1879048189
+          HierarchyParent     #Attachment
+          DataSource          #SysEmailParameters
+          DataField           #EmailConfirmation
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL INTEDIT
+        PROPERTIES
+          Name                #Attachment_MaxSize
+          ElementPosition     #1073741822
+          HierarchyParent     #Attachment
+          Label               #@SYS96610
+          DataSource          #SysEmailParameters
+          DataField           #maxEmailAttachmentSize
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL INTEDIT
+        PROPERTIES
+          Name                #SMTP_SMTPPortNumber
+          ElementPosition     #1073741820
+          HierarchyParent     #SMTP
+          DataSource          #SysEmailParameters
+          DataField           #SMTPPortNumber
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #EWS_OutlookUserName
+          AutoDeclaration     #Yes
+          ElementPosition     #1073741822
+          HierarchyParent     #EWS
+          DataSource          #SysEmailParameters
+          DataField           #EWSUsername
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #EWS_Password
+          AutoDeclaration     #Yes
+          HelpText            #@FTH523
+          ElementPosition     #1610612733
+          HierarchyParent     #EWS
+          PasswordStyle       #Yes
+          Label               #@FTH520
+          DataSource          #SysEmailSMTPPassword
+          DataMethod          #setEWSPassword
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #SMTP_Password
+          AutoDeclaration     #Yes
+          ElementPosition     #1610612730
+          HierarchyParent     #SMTP
+          PasswordStyle       #Yes
+          DataSource          #SysEmailSMTPPassword
+          DataMethod          #setPassword
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #SMTP_SMTPRelayServerName
+          ElementPosition     #536870910
+          HierarchyParent     #SMTP
+          DataSource          #SysEmailParameters
+          DataField           #SMTPRelayServerName
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #SMTP_SMTPServerIPAddress
+          ElementPosition     #805306365
+          HierarchyParent     #SMTP
+          DataSource          #SysEmailParameters
+          DataField           #SMTPServerIPAddress
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #SMTP_SMTPUserName
+          AutoDeclaration     #Yes
+          ElementPosition     #1342177275
+          HierarchyParent     #SMTP
+          DataSource          #SysEmailParameters
+          DataField           #SMTPUserName
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #SysEmailParameters_AttachmentsPath
+          ElementPosition     #1610612733
+          HierarchyParent     #Attachment
+          Label               #@SYS98434
+          DataSource          #SysEmailParameters
+          DataField           #AttachmentsPath
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+    ENDCONTAINER
+    
+  ENDDESIGN
+  
+  PERMISSIONS #Permissions
+    PROPERTIES
+    ENDPROPERTIES
+    
+    PERMISSIONSET #Read
+      PROPERTIES
+      ENDPROPERTIES
+      
+      FORM #Controls
+      ENDFORM
+      
+    TABLES #Tables
+    ENDTABLES
+    
+  SERVERMETHODS #Server Methods
+  ENDSERVERMETHODS
+  
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Update
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Create
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Delete
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+ENDPERMISSIONS
+
+ENDFORM
+
+
+***Element: FRM
+
+; Microsoft Dynamics AX Forms unloaded
+; --------------------------------------------------------------------------------
+FRMVERSION 12
+
+FORM #SysOutgoingEmailTable
+  PROPERTIES
+    Name                #SysOutgoingEmailTable
+    Origin              #{F6F6FB7A-AF94-46B4-9EF4-E8F5122B01FA}
+  ENDPROPERTIES
+  
+  METHODS
+    SOURCE #classDeclaration
+      #public class FormRun extends ObjectRun
+      #{
+      #     QueryBuildRange     criteriaOpen;
+      #     QueryBuildRange     criteriaOutlook;
+      #}
+    ENDSOURCE
+    SOURCE #init
+      #public void init()
+      #{
+      #    super();
+      #
+      #    checkBoxSelect.value(NoYes::No);
+      #    ShowOutlookInvites.value(NoYes::No);
+      #}
+    ENDSOURCE
+  ENDMETHODS
+  OBJECTBANK
+    PROPERTIES
+    ENDPROPERTIES
+    
+    DATASOURCE
+      OBJECTPOOL
+        PROPERTIES
+          Name                #OutgoingEmail
+          Table               #SysOutgoingEmailTable
+          AllowEdit           #No
+          AllowCreate         #No
+          InsertAtEnd         #No
+          InsertIfEmpty       #No
+        ENDPROPERTIES
+        
+        FIELDLIST
+        ENDFIELDLIST
+      ENDOBJECTPOOL
+      METHODS
+        SOURCE #init
+          #public void init()
+          #{
+          #    super();
+          #
+          #    criteriaOpen       = this.query().dataSourceNo(1).addRange(fieldnum(SysoutgoingEmailTable, Status));
+          #    criteriaOutlook    = this.query().dataSourceNo(1).addRange(fieldnum(SysoutgoingEmailTable, IsOutlookInvite));
+          #    this.query().dataSourceNo(1).addSortField(fieldnum(SysoutgoingEmailTable, EmailItemId),SortOrder::Descending);
+          #
+          #}
+        ENDSOURCE
+        SOURCE #executeQuery
+          #public void executeQuery()
+          #{
+          #    if(!ShowOutlookInvites.checked())
+          #    {
+          #        criteriaOutlook.value(strfmt('%1', NoYes::No));
+          #        switch (checkBoxSelect.value())
+          #        {
+          #            case NoYes::No:
+          #                criteriaOpen.value(strfmt('!%1',enum2Value(SysEmailStatus::Sent)));
+          #                break;
+          #
+          #            case NoYes::Yes:
+          #                criteriaOpen.value('');
+          #                break;
+          #        }
+          #    }
+          #    else
+          #    {
+          #        criteriaOutlook.value(strfmt('%1', NoYes::Yes));
+          #        criteriaOpen.value('');
+          #    }
+          #
+          #    super();
+          #
+          #    if (outgoingEmail.RecId == 0)
+          #    {
+          #        resetEmailBUtton.enabled(false);
+          #        showMessageButton.enabled(false);
+          #    }
+          #    else if(ShowOutlookInvites.checked())
+          #    {
+          #        ResetEmailButton.enabled(NoYes::No);
+          #    }
+          #    else
+          #    {
+          #        resetEmailBUtton.enabled(true);
+          #        showMessageButton.enabled(true);
+          #    }
+          #}
+        ENDSOURCE
+        SOURCE #resetEmailSend
+          #void resetEmailSend()
+          #{
+          #    SysoutgoingEmailTable    outgoingEmailTable;
+          #    SysoutgoingEmailTable    tmpCache;
+          #    ;
+          #
+          #    for (tmpCache = getFirstSelection(outgoingEmail_DS);
+          #          tmpCache;
+          #          tmpCache=outgoingEmail_DS.getNext())
+          #    {
+          #        ttsbegin;
+          #
+          #            outgoingEmailTable = SysoutgoingEmailTable::find(tmpCache.EmailItemId,true);
+          #            outgoingEmailTable.Status = SysEmailStatus::Unsent;
+          #            outgoingEmailTable.RetryNum = 0;
+          #
+          #            outgoingEmailTable.update();
+          #            tmpCache.reread();
+          #            grid.arrange();
+          #
+          #        ttscommit;
+          #    }
+          #
+          #    outgoingEmail_DS.reread();
+          #
+          #
+          #}
+        ENDSOURCE
+      ENDMETHODS
+    ENDDATASOURCE
+  ENDOBJECTBANK
+  
+  REFERENCEDATASOURCES
+  ENDREFERENCEDATASOURCES
+  
+  JOINS
+  ENDJOINS
+  
+  PARTREFERENCES
+  ENDPARTREFERENCES
+  
+  DESIGN
+    PROPERTIES
+      Caption             #@SYS94137
+      TitleDatasource     #OutgoingEmail
+      SetCompany          #No
+      Columns             #2
+      ArrangeGuide        
+        ARRAY INDEX Columns 
+          #0
+          #0
+        ENDARRAY
+      ViewEditMode        #Edit
+    ENDPROPERTIES
+    
+    CONTAINER
+      CONTROL BUTTONGROUP
+        PROPERTIES
+          Name                #ButtonGroup
+          ElementPosition     #1610612733
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GRID
+        PROPERTIES
+          Name                #Grid
+          AutoDeclaration     #Yes
+          Width               #Column width
+          Height              #Column height
+          ElementPosition     #1073741822
+          DataSource          #OutgoingEmail
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL BUTTON
+        PROPERTIES
+          Name                #ResetEmailButton
+          AutoDeclaration     #Yes
+          HelpText            #@SYS93668
+          ElementPosition     #1073741822
+          HierarchyParent     #ButtonGroup
+          Text                #@SYS93667
+          MultiSelect         #Yes
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #void clicked()
+            #{
+            #    super();
+            #
+            #    outgoingEmail_DS.resetEmailSend();
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #CheckBoxSelect
+          AutoDeclaration     #Yes
+          ElementPosition     #536870911
+          Label               #@SYS93665
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #public void clicked()
+            #{
+            #    super();
+            #
+            #    ShowOutlookInvites.value(NoYes::No);
+            #    outgoingEmail_DS.executeQuery();
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #ShowOutlookInvites
+          AutoDeclaration     #Yes
+          ElementPosition     #805306366
+          Label               #@FTH525
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #public void clicked()
+            #{
+            #    super();
+            #
+            #    CheckBoxSelect.value(NoYes::No);
+            #    outgoingEmail_DS.executeQuery();
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL MENUITEMBUTTON
+        PROPERTIES
+          Name                #ShowMessageButton
+          AutoDeclaration     #Yes
+          ElementPosition     #1610612733
+          HierarchyParent     #ButtonGroup
+          Text                #@SYS76779
+          DataSource          #OutgoingEmail
+          MenuItemName        #SysOutgoingEmailMessage
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_Origin
+          ElementPosition     #1342177275
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataField           #Origin
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_Recipient
+          ElementPosition     #1879048185
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataField           #Recipient
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_StatusInfoDetails
+          ElementPosition     #1073741820
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataMethod          #getStatusInfoDetails
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_UserId
+          ElementPosition     #1610612730
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataField           #UserId
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL UTCDATETIMEEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_CreatedDateTime
+          ElementPosition     #536870910
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataField           #createdDateTime
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL UTCDATETIMEEDIT
+        PROPERTIES
+          Name                #OutgoingEmail_LatestStatusChangeDateTime
+          ElementPosition     #805306365
+          HierarchyParent     #Grid
+          DataSource          #OutgoingEmail
+          DataField           #LatestStatusChangeDateTime
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+    ENDCONTAINER
+    
+  ENDDESIGN
+  
+  PERMISSIONS #Permissions
+    PROPERTIES
+    ENDPROPERTIES
+    
+    PERMISSIONSET #Read
+      PROPERTIES
+      ENDPROPERTIES
+      
+      FORM #Controls
+      ENDFORM
+      
+    TABLES #Tables
+    ENDTABLES
+    
+  SERVERMETHODS #Server Methods
+  ENDSERVERMETHODS
+  
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Update
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Create
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Delete
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+ENDPERMISSIONS
+
+ENDFORM
+
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: FthWorkflow2Outlook unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #FthWorkflow2Outlook
+    PROPERTIES
+      Name                #FthWorkflow2Outlook
+      Extends             #SysOperationServiceController
+      Origin              #{17063B15-24A5-4DBB-9BDA-BE34FA411AF6}
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #/// <summary>
+        #/// Batch service operation class for workflow outlook integration
+        #/// </summary>
+        #/// <remarks>
+        #/// Class containing business logic for workflow outlook integration
+        #/// </remarks>
+        #
+        #class FthWorkflow2Outlook extends SysOperationServiceController
+        #{
+        #    WorkflowWorkItemTable                        worklflowWorkItemTable;
+        #    AsposeEmailClassLibrary.OutlookIntegration   outlookInstance;
+        #
+        #    #DEFINE.mapUri('https://outlook.office365.com/ews/exchange.asmx')
+        #    #DEFINE.outlookVotingMail('WorkItem')
+        #}
+      ENDSOURCE
+      SOURCE #getEventInbox
+        #protected EventInbox getEventInbox()
+        #{
+        #    EventInbox  eventInbox;
+        #
+        #    select eventInbox
+        #        where eventInbox.InboxId == worklflowWorkItemTable.NotificationId;
+        #
+        #    return eventInbox;
+        #}
+      ENDSOURCE
+      SOURCE #insertOutlookMailInfo
+        #/// <summary>
+        #/// Inserts mail info of for outlook worklfow mail
+        #/// </summary>
+        #/// <param name="_emailAddr">
+        #/// Email address
+        #/// </param>
+        #/// <param name="_messageBody">
+        #/// Message body
+        #/// </param>
+        #/// <remarks>
+        #/// Inserts mail info of for outlook worklfow mail
+        #/// </remarks>
+        #
+        #protected void insertOutlookMailInfo(EventInbox _eventInbox)
+        #{
+        #    SysOutgoingEmailTable outgoingEmailTable;
+        #    SysEmailItemId        nextEmailItemId;
+        #    SysEmailParameters    parameters;
+        #    SysUserInfo           sysuserInfo;
+        #
+        #    ttsbegin;
+        #
+        #    nextEmailItemId                                 = EventInbox::nextEventId();
+        #    parameters                                      = SysEmailParameters::find();
+        #
+        #    outgoingEmailTable.EmailItemId                  = nextEmailItemId;
+        #    outgoingEmailTable.TemplateId                   = 'FthEvent';
+        #    outgoingEmailTable.IsSystemEmail                = NoYes::No;
+        #
+        #    outgoingEmailTable.Sender                       = parameters.EWSUsername;
+        #    outgoingEmailTable.SenderName                   = 'People operations';
+        #    outgoingEmailTable.Recipient                    = _eventInbox.EmailRecipient;
+        #
+        #    outgoingEmailTable.Subject                      = strReplace(_eventInbox.AlertedFor,':','-');
+        #
+        #    outgoingEmailTable.Priority                     = eMailPriority::Normal;
+        #
+        #    outgoingEmailTable.Message                      = _eventInbox.Message;
+        #
+        #    select Id from sysUserInfo
+        #        where sysuserInfo.Email                     == _eventInbox.EmailRecipient;
+        #
+        #    outgoingEmailTable.UserId                       = sysuserInfo.Id;
+        #    outgoingEmailTable.Status                       = SysEmailStatus::Sent;
+        #    outgoingEmailTable.IsOutlookInvite              = NoYes::Yes;
+        #    outgoingEmailTable.Origin                       = #outlookVotingMail;
+        #
+        #    outgoingEmailTable.LatestStatusChangeDateTime   = DateTimeUtil::getSystemDateTime();
+        #    outgoingEmailTable.insert();
+        #
+        #    ttsCommit;
+        #}
+      ENDSOURCE
+      SOURCE #isAlreadySent
+        #protected boolean isAlreadySent(EventInbox _eventInbox)
+        #{
+        #    SysOutgoingEmailTable sysOutgoingEmailTable;
+        #
+        #    select RecId from sysOutgoingEmailTable
+        #        where sysOutgoingEmailTable.Subject          == strReplace(_eventInbox.AlertedFor,':','-')
+        #            && sysOutgoingEmailTable.Recipient       == _eventInbox.EmailRecipient
+        #            && sysOutgoingEmailTable.IsOutlookInvite == NoYes::Yes
+        #            && sysOutgoingEmailTable.Status          == SysEmailStatus::Sent
+        #            && sysOutgoingEmailTable.Origin          == #outlookVotingMail;
+        #
+        #    if(sysOutgoingEmailTable.RecId)
+        #    {
+        #        return true;
+        #    }
+        #
+        #    return false;
+        #}
+      ENDSOURCE
+      SOURCE #mapvotingOptions
+        #protected str mapvotingOptions()
+        #{
+        #    WorkflowElementTable    workflowElementTable;
+        #    WorkflowActionTable     workflowActionTable;
+        #    str                     votingOptions;
+        #    workflowElementTable = worklflowWorkItemTable.workflowElementTable();
+        #
+        #    while select Name from workflowActionTable
+        #        where workflowActionTable.WorkflowElementTable == workflowElementTable.RecId
+        #           && workflowActionTable.Enabled              == NoYes::Yes
+        #    {
+        #        votingOptions += workflowActionTable.Name + ';';
+        #    }
+        #
+        #    return votingOptions;
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #public void new(identifierName _className = "", identifierName _methodName = "", SysOperationExecutionMode _executionMode = 0)
+        #{
+        #    super();
+        #    this.parmClassName(_className);
+        #    this.parmMethodName(_methodName);
+        #    this.parmExecutionMode(_executionMode);
+        #}
+      ENDSOURCE
+      SOURCE #processOutlookResponse
+        #protected void processOutlookResponse(EventInbox _eventInbox)
+        #{
+        #    str                         response;
+        #    System.String               subject;
+        #    System.String               emailAddress;
+        #    WorkflowElementTable        elementTable;
+        #    SysWorkflowElement          sysWorkflowElement;
+        #    MenuItemName                menuItemName;
+        #    WorkflowWorkItemActionType  workflowWorkItemActionType;
+        #
+        #    subject         = strReplace(_eventInbox.AlertedFor,':','-');
+        #    subject         = strReplace(subject, "'","");
+        #    emailAddress    = _eventInbox.EmailRecipient;
+        #    response        = outlookInstance.getVotingResponses(emailAddress, subject);
+        #
+        #    if(response != 'Unknown')
+        #    {
+        #        elementTable               = worklflowWorkItemTable.workflowElementTable();
+        #        sysWorkflowElement         = SysWorkflowElement::newElementTable(elementTable);
+        #
+        #        menuItemName               = sysWorkflowElement.actionMenuItem(response);
+        #        workflowWorkItemActionType = WorkflowWorkItemActionManager::findActionTypeForMenuItem(worklflowWorkItemTable,menuItemName,false);
+        #
+        #        WorkflowWorkItemActionManager::dispatchWorkItemAction
+        #            (worklflowWorkItemTable, 'Approved over outlook','', workflowWorkItemActionType, menuItemName, false, '');
+        #    }
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #runOutlookIntegration
+        #// <summary>
+        #/// Executes logic to be executed when the batch is running
+        #/// </summary>
+        #/// <param name="_data">
+        #/// Data contract class
+        #/// </param>
+        #/// <remarks>
+        #/// Executes logic to be executed when the batch is running
+        #/// </remarks>
+        #
+        #public void runOutlookIntegration(FthEventManagementOutlookDataContract _data)
+        #{
+        #    System.String                                   userEmail;
+        #    System.String                                   userPassword;
+        #    SysEmailParameters                              parameters;
+        #
+        #    outlookInstance                      = new AsposeEmailClassLibrary.OutlookIntegration();
+        #    parameters                           = SysEmailParameters::find();
+        #    userEmail                            = parameters.EWSUsername;
+        #    userPassword                         = SysEmailParameters::EWSpassword();
+        #
+        #    outlookInstance.exchangeEWSClient(#mapUri, userEmail, userPassword, "");
+        #
+        #    while select worklflowWorkItemTable
+        #        where worklflowWorkItemTable.Status == WorkflowWorkItemStatus::Pending
+        #    {
+        #        this.sendOutlookMails();
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #sendOutlookMails
+        #protected void sendOutlookMails()
+        #{
+        #    EventInbox      eventInbox;
+        #
+        #    System.String   subject;
+        #    System.String   body;
+        #    System.String[]   toAddress;
+        #    System.String   votingOptions;
+        #    System.String   fromAddress;
+        #    System.DateTime dueDateTime;
+        #
+        #    eventInbox  = this.getEventInbox();
+        #
+        #    if(eventInbox.EmailRecipient)
+        #    {
+        #        if(!this.isAlreadySent(eventInbox))
+        #        {
+        #            toAddress       = new System.String[1]();
+        #            subject         = strReplace(eventInbox.AlertedFor, ':','-');
+        #            subject         = strReplace(subject, "'","");
+        #            body            = eventInbox.Message;
+        #            fromAddress     = SysEmailParameters::find().EWSUsername;
+        #            toAddress.SetValue(eventInbox.EmailRecipient,0);
+        #            votingOptions   = this.mapvotingOptions();
+        #            dueDateTime     = eventInbox.DueDateTime;
+        #            outlookInstance.sendVotingMail(fromAddress, toAddress, subject, votingOptions, body);
+        #            this.insertOutlookMailInfo(eventInbox);
+        #        }
+        #        else
+        #        {
+        #            this.processOutlookResponse(eventInbox);
+        #        }
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #/// <summary>
+        #/// Contruct method of class
+        #/// </summary>
+        #/// <returns>
+        #/// Batch service operation
+        #/// </returns>
+        #/// <remarks>
+        #/// Contruct method of class
+        #/// </remarks>
+        #
+        #public static FthWorkflow2Outlook construct()
+        #{
+        #    ClassName                   className;
+        #    MethodName                  runMethodName;
+        #    SysOperationExecutionMode   execMode;
+        #    FthWorkflow2Outlook   batchServiceOp;
+        #
+        #    execMode            = SysOperationExecutionMode::Synchronous;
+        #
+        #    className           = classStr(FthWorkflow2Outlook);
+        #    runMethodName       = methodStr(FthWorkflow2Outlook, runOutlookIntegration);
+        #    batchServiceOp      = new FthWorkflow2Outlook(className,
+        #                                  runmethodName,
+        #                                  execMode);
+        #    batchServiceOp.parmDialogCaption('Outlook worklfow processing');
+        #    return batchServiceOp;
+        #}
+      ENDSOURCE
+      SOURCE #main
+        #public static void main(Args args)
+        #{
+        #    FthWorkflow2Outlook       FthWorkflow2Outlook;
+        #
+        #    FthWorkflow2Outlook       = FthWorkflow2Outlook::construct();
+        #    FthWorkflow2Outlook.parmShowDialog(true);
+        #    FthWorkflow2Outlook.showBatchTab(true);
+        #
+        #    FthWorkflow2Outlook.startOperation();
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: FthWorkflow2OutlookDataContract unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #FthWorkflow2OutlookDataContract
+    PROPERTIES
+      Name                #FthWorkflow2OutlookDataContract
+      Origin              #{E5FBC49F-5653-4652-A67E-7C2AE305202F}
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #/// <summary>
+        #/// Data Contract class for Workflow outlook integration
+        #/// </summary>
+        #/// <remarks>
+        #/// Data Contract class for Workflow outlook integration
+        #/// </remarks>
+        #
+        #[DataContractAttribute]
+        #class FthWorkflow2OutlookDataContract
+        #{
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: REF
+
+; Microsoft Dynamics AX REFERENCE : Microsoft.Exchange.WebServices unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  REFERENCE #Microsoft.Exchange.WebServices
+    PROPERTIES
+      Name                #Microsoft.Exchange.WebServices
+      AssemblyName        #Microsoft.Exchange.WebServices
+      AssemblyDisplayName #Microsoft.Exchange.WebServices, Version=15.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35
+      Culture             #
+      PublicKeyToken      #31bf3856ad364e35
+      Version             #15.0.0.0
+      ServiceReference    #No
+      WSDLURL             #
+      .NETCodeNamespace   #
+      ServiceDescription  #
+      Origin              #{66E9C5A4-0033-4A6C-BF27-F678635483E7}
+    ENDPROPERTIES
+    
+  ENDREFERENCE
+  
+
+***Element: REF
+
+; Microsoft Dynamics AX REFERENCE : Aspose.Email unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  REFERENCE #Aspose.Email
+    PROPERTIES
+      Name                #Aspose.Email
+      AssemblyName        #Aspose.Email
+      AssemblyDisplayName #Aspose.Email, Version=4.5.0.0, Culture=neutral, PublicKeyToken=ad504e9f0d34714a
+      Culture             #
+      PublicKeyToken      #ad504e9f0d34714a
+      Version             #4.5.0.0
+      ServiceReference    #No
+      WSDLURL             #
+      .NETCodeNamespace   #
+      ServiceDescription  #
+      Origin              #{DB7ADFB1-6B68-4AC4-B940-D9B6160D151C}
+    ENDPROPERTIES
+    
+  ENDREFERENCE
+  
+
+***Element: VPC
+
+; Microsoft Dynamics AX VISUALSTUDIOPROJECT : EWSIntegrationClassLibrary unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  VISUALSTUDIOPROJECT #EWSIntegrationClassLibrary
+    PROPERTIES
+      Name                #EWSIntegrationClassLibrary
+      ProjectGUID         #{4EE6D0BC-7CF0-4C1C-A590-22750F1425E1}
+      ProjectTypeGUID     #{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
+      VisualStudioProjectFile   #EWSIntegrationClassLibrary.csproj
+      DeployTo            #Server Client 
+      Origin              #{726582FE-CC5C-4816-B0E7-70DABA60DC14}
+    ENDPROPERTIES
+    
+    REFERENCEDPROJECTS
+      #
+    ENDREFERENCEDPROJECTS
+    
+    VISUALSTUDIOPROJECTFOLDER #Project Content
+      PROPERTIES
+        Name                #Project Content
+      ENDPROPERTIES
+      
+      VISUALSTUDIOPROJECTFOLDER #Properties
+        PROPERTIES
+          Name                #Properties
+        ENDPROPERTIES
+        
+        VISUALSTUDIOPROJECTFILE #AssemblyInfo.cs
+          PROPERTIES
+            Name                #AssemblyInfo.cs
+          ENDPROPERTIES
+          
+          SOURCE 1464
+#﻿using System.Reflection;
+#using System.Runtime.CompilerServices;
+#using System.Runtime.InteropServices;
+#
+#// General Information about an assembly is controlled through the following 
+#// set of attributes. Change these attribute values to modify the information
+#// associated with an assembly.
+#[assembly: AssemblyTitle("EWSIntegrationClassLibrary")]
+#[assembly: AssemblyDescription("")]
+#[assembly: AssemblyConfiguration("")]
+#[assembly: AssemblyCompany("")]
+#[assembly: AssemblyProduct("EWSIntegrationClassLibrary")]
+#[assembly: AssemblyCopyright("Copyright ©  2014")]
+#[assembly: AssemblyTrademark("")]
+#[assembly: AssemblyCulture("")]
+#
+#// Setting ComVisible to false makes the types in this assembly not visible 
+#// to COM components.  If you need to access a type in this assembly from 
+#// COM, set the ComVisible attribute to true on that type.
+#[assembly: ComVisible(false)]
+#
+#// The following GUID is for the ID of the typelib if this project is exposed to COM
+#[assembly: Guid("4c3cea16-4c52-4634-83a3-2c9ad3cf1f74")]
+#
+#// Version information for an assembly consists of the following four values:
+#//
+#//      Major Version
+#//      Minor Version 
+#//      Build Number
+#//      Revision
+#//
+#// You can specify all the values or you can default the Build and Revision Numbers 
+#// by using the '*' as shown below:
+#// [assembly: AssemblyVersion("1.0.*")]
+#[assembly: AssemblyVersion("1.0.0.0")]
+#[assembly: AssemblyFileVersion("1.0.0.0")]
+          ENDSOURCE
+        ENDVISUALSTUDIOPROJECTFILE
+        
+      ENDVISUALSTUDIOPROJECTFOLDER
+      
+      VISUALSTUDIOPROJECTFILE #Class1.cs
+        PROPERTIES
+          Name                #Class1.cs
+        ENDPROPERTIES
+        
+        SOURCE 7489
+#﻿using System;
+#using System.Collections.Generic;
+#using System.Linq;
+#using System.Text;
+#using System.Threading.Tasks;
+#using System.Net;
+#using System.Net.Security;
+#using System.Security.Cryptography.X509Certificates;
+#using Microsoft.Exchange.WebServices.Data;
+#
+#namespace EWSIntegrationClassLibrary
+#{
+#    public class OutlookIntegration
+#    {
+#        private ExchangeService exchangeServiceInstance;
+#        private string ItemId;
+#
+#        private static bool CertificateValidationCallBack(
+#            object sender,
+#            System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+#            System.Security.Cryptography.X509Certificates.X509Chain chain,
+#            System.Net.Security.SslPolicyErrors sslPolicyErrors)
+#        {
+#            // If the certificate is a valid, signed certificate, return true.
+#            if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+#            {
+#                return true;
+#            }
+#
+#            // If there are errors in the certificate chain, look at each error to determine the cause.
+#            if ((sslPolicyErrors & System.Net.Security.SslPolicyErrors.RemoteCertificateChainErrors) != 0)
+#            {
+#                if (chain != null && chain.ChainStatus != null)
+#                {
+#                    foreach (System.Security.Cryptography.X509Certificates.X509ChainStatus status in chain.ChainStatus)
+#                    {
+#                        if ((certificate.Subject == certificate.Issuer) &&
+#                           (status.Status == System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.UntrustedRoot))
+#                        {
+#                            // Self-signed certificates with an untrusted root are valid. 
+#                            continue;
+#                        }
+#                        else
+#                        {
+#                            if (status.Status != System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.NoError)
+#                            {
+#                                // If there are any other errors in the certificate chain, the certificate is invalid,
+#                                // so the method returns false.
+#                                return false;
+#                            }
+#                        }
+#                    }
+#                }
+#
+#                // When processing reaches this line, the only errors in the certificate chain are 
+#                // untrusted root errors for self-signed certificates. These certificates are valid
+#                // for default Exchange server installations, so return true.
+#                return true;
+#            }
+#            else
+#            {
+#                // In all other cases, return false.
+#                return false;
+#            }
+#        }
+#
+#        private static bool RedirectionUrlValidationCallback(string redirectionUrl)
+#        {
+#            // The default for the validation callback is to reject the URL.
+#            bool result = false;
+#
+#            Uri redirectionUri = new Uri(redirectionUrl);
+#
+#            // Validate the contents of the redirection URL. In this simple validation
+#            // callback, the redirection URL is considered valid if it is using HTTPS
+#            // to encrypt the authentication credentials. 
+#            if (redirectionUri.Scheme == "https")
+#            {
+#                result = true;
+#            }
+#            return result;
+#        }
+#
+#        private ExchangeService getExchangeServiceInstance(string _username, string _password)
+#        {
+#            ServicePointManager.ServerCertificateValidationCallback = CertificateValidationCallBack;
+#
+#            ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2013);
+#
+#            service.Credentials = new WebCredentials(_username, _password);
+#
+#            service.AutodiscoverUrl(_username, RedirectionUrlValidationCallback);
+#
+#            return service;
+#        }
+#
+#        private Appointment getAppointment(string _itemId)
+#        {
+#            ExtendedPropertyDefinition def = new ExtendedPropertyDefinition(DefaultExtendedPropertySet.PublicStrings, "AppointmenId", MapiPropertyType.String);
+#
+#            SearchFilter filter = new SearchFilter.IsEqualTo(def, _itemId);
+#
+#            FindItemsResults<Item> fir = exchangeServiceInstance.FindItems(WellKnownFolderName.Calendar, filter, new ItemView(10));
+#
+#            Appointment appointment = (Appointment)fir.Items[0];
+#
+#            return appointment;
+#        }
+#
+#        public void exchangeServiceAuthentication(string _username, string _password)
+#        {
+#            exchangeServiceInstance = getExchangeServiceInstance(_username, _password);
+#        }
+#
+#        public void bindExchangeServiceItem(string _itemId)
+#        {
+#            ItemId = _itemId;
+#        }
+#
+#        public void sendEmail(string _subject, string _body, string _recipient)
+#        {
+#            EmailMessage email = new EmailMessage(exchangeServiceInstance);
+#            email.ToRecipients.Add(_recipient);
+#            email.Subject = _subject;
+#            email.Body = new MessageBody(_body);
+#            email.Send();
+#        }
+#
+#        public void sendInvites(string _subject, string _body, string[] _recipient, string _location, DateTime _start, DateTime _end)
+#        {
+#            // Create the appointment.
+#            Appointment appointment = new Appointment(exchangeServiceInstance);
+#
+#            ExtendedPropertyDefinition def = new ExtendedPropertyDefinition(DefaultExtendedPropertySet.PublicStrings, "AppointmenId", MapiPropertyType.String);
+#
+#            // Set properties on the appointment. Add two required attendees and one optional attendee.
+#            appointment.Subject = _subject;
+#            appointment.Body = _body;
+#            appointment.Start = _start;
+#            appointment.End = _end;
+#            appointment.Location = _location;
+#            for (int i = 0; i < _recipient.Length; i++)
+#            {
+#                appointment.RequiredAttendees.Add(_recipient[i]);
+#            }
+#
+#
+#            appointment.SetExtendedProperty(def, ItemId.ToString());
+#
+#            // Send the meeting request to all attendees and save a copy in the Sent Items folder.
+#            appointment.Save(SendInvitationsMode.SendToAllAndSaveCopy);
+#        }
+#
+#        public string getAttendeeResponse(string _itemId, string _address)
+#        {
+#            Appointment appointmentInstance = getAppointment(_itemId);
+#
+#            appointmentInstance = Appointment.Bind(exchangeServiceInstance, appointmentInstance.Id);
+#
+#            // Check responses from required attendees.
+#            for (int i = 0; i < appointmentInstance.RequiredAttendees.Count; i++)
+#            {
+#                if (appointmentInstance.RequiredAttendees[i].Address == _address)
+#                {
+#                    return appointmentInstance.RequiredAttendees[i].ResponseType.Value.ToString();
+#                }
+#            }
+#
+#            return "";
+#        }
+#
+#        public void cancelInvitation(string _itemId)
+#        {
+#            Appointment appointmentInstance = getAppointment(_itemId);
+#
+#            appointmentInstance = Appointment.Bind(exchangeServiceInstance, appointmentInstance.Id);
+#
+#            appointmentInstance.Delete(DeleteMode.MoveToDeletedItems, SendCancellationsMode.SendOnlyToAll);
+#        }
+#
+#    }
+#}
+        ENDSOURCE
+      ENDVISUALSTUDIOPROJECTFILE
+      
+      VISUALSTUDIOPROJECTFILE #EWSAssemblySignature.pfx
+        PROPERTIES
+          Name                #EWSAssemblySignature.pfx
+          IsBinary            #Yes
+        ENDPROPERTIES
+        
+        BINARY 1764
+          30 82 06 E0 02 01 03 30 82 06 9C 06 09 2A 86 48 86 F7 0D 01 07 01 A0 82 06 8D 04 82 06 89 30 82
+          06 85 30 82 03 B6 06 09 2A 86 48 86 F7 0D 01 07 01 A0 82 03 A7 04 82 03 A3 30 82 03 9F 30 82 03
+          9B 06 0B 2A 86 48 86 F7 0D 01 0C 0A 01 02 A0 82 02 B6 30 82 02 B2 30 1C 06 0A 2A 86 48 86 F7 0D
+          01 0C 01 03 30 0E 04 08 11 47 98 D2 38 77 86 E2 02 02 07 D0 04 82 02 90 49 87 1C FD B4 4A 90 68
+          23 A6 04 E7 5C B2 E0 C6 5A 77 33 B1 21 5A 38 EE 07 0E 1E 17 3B AB 6D AE 99 AF AA B7 F2 26 E3 E9
+          37 E2 58 61 6F BD 64 4F E6 57 E2 FC 27 74 50 20 44 EB F4 5D 95 2C 3F 8B 07 75 03 B3 34 28 39 6A
+          E8 90 14 27 9E DC 9A 40 43 3F 9A DA 6E BB 6B BE 86 73 91 50 1C FB 18 96 66 72 AF 0B 95 28 2E B3
+          D4 0B 7E D7 91 86 64 60 C4 4E 38 1B 43 A5 EE 66 93 81 4C 2E 69 B3 FE AE C3 A0 95 6A 87 42 2B D6
+          F8 52 96 88 E4 F7 B5 1D CF 9E FB 2C B4 4E F1 BA 4E EA BA 2E BB 63 90 EB 56 51 29 7C 3C E3 6C 3D
+          8C 3E 3A 48 8E 51 D2 31 5F 03 81 53 A1 FC CD 75 F5 F4 CF C8 7F AA 2C 2B 8D 98 1F AD B4 A0 A4 D7
+          D3 C5 7C 26 1D A2 51 DB E0 52 C1 04 99 CF D3 44 8E 67 2D E8 B8 AF 0B B1 20 C1 5C B3 45 C4 46 C8
+          C7 C5 C5 0C E2 23 1E 79 CD 9C F2 38 B6 AF 04 B1 BE 89 CA 3B 5C 78 5D CE 83 CA 9C 6A 63 FF D2 03
+          6E 81 CB B7 72 0B 5F 22 52 11 BA 1A FD 0F 7F B9 5E DD A9 67 C3 AA 3A E7 EF 89 CE 20 6A 77 4F BE
+          C8 B6 77 D2 04 7C 6C 78 62 9E 82 31 EB 1B F1 A8 45 BE E7 FE E8 20 8B 81 76 39 E5 F0 C1 C3 E3 4D
+          AD 10 C2 6B CD C9 14 DC A8 E2 26 AB 28 21 C1 E7 40 E0 BD E3 C0 80 C1 DC 88 96 AC 22 4F C3 BA 2C
+          89 68 0B 04 F5 3F D0 C2 6F 1F D2 92 55 1D 0A C5 22 2A 4D 3F 2B 21 48 48 A7 DD C6 FD CF 0B B9 7B
+          EE BB 34 FE 07 BC 2E EA D0 C9 28 27 36 21 96 E4 ED F0 4F 31 D8 07 5F F5 E2 CA D0 CB 39 9C A6 0B
+          CE 33 34 F2 67 A6 2D D2 14 DB 64 14 60 2C 31 37 38 BF 3D 9E 9A 3E 71 0D 68 44 31 6B 7B 2E C7 FB
+          66 DC E3 CC 88 04 C5 71 7C 0C AE 74 01 7D F4 8C 6B A7 29 63 20 6A 6E B5 E5 20 85 98 AC 9B DA 3E
+          BB 41 57 CA 8B 13 E7 77 7D E7 7A BB 29 7B 4E 85 51 E0 E2 88 1C 43 5C 00 CF 6D 5A 9D 2B 2B 4A 45
+          0D B3 FA 5C 69 A2 37 25 13 DB E2 C5 F3 FC 01 36 5E 40 CB 83 7A A1 8B DA 69 B3 BF CF 28 0E 5A 49
+          D5 F2 58 AF CF 1D 05 F3 68 D3 44 36 D7 23 C7 D2 48 E1 7C 32 A1 27 C6 1B 77 3C 5C 7E B1 78 B9 90
+          0D FA 28 41 05 E4 AC EA 84 76 FC 9D 86 08 03 59 8A 02 8F 03 D8 68 05 2C 51 D3 3F 6A 1A 1C 2E 52
+          AB 1E A4 CD 5B BC 6E 08 77 49 86 A4 A2 52 B5 D4 5E 8D E1 BB FF BD 2B 54 A7 DE 88 BB 94 E1 D0 99
+          1D B8 A0 B1 0C 56 55 D3 31 81 D1 30 13 06 09 2A 86 48 86 F7 0D 01 09 15 31 06 04 04 01 00 00 00
+          30 5B 06 09 2A 86 48 86 F7 0D 01 09 14 31 4E 1E 4C 00 7B 00 31 00 41 00 34 00 31 00 42 00 46 00
+          46 00 30 00 2D 00 32 00 32 00 37 00 36 00 2D 00 34 00 42 00 46 00 44 00 2D 00 41 00 42 00 32 00
+          32 00 2D 00 46 00 36 00 36 00 43 00 43 00 41 00 39 00 37 00 46 00 35 00 35 00 45 00 7D 30 5D 06
+          09 2B 06 01 04 01 82 37 11 01 31 50 1E 4E 00 4D 00 69 00 63 00 72 00 6F 00 73 00 6F 00 66 00 74
+          00 20 00 53 00 74 00 72 00 6F 00 6E 00 67 00 20 00 43 00 72 00 79 00 70 00 74 00 6F 00 67 00 72
+          00 61 00 70 00 68 00 69 00 63 00 20 00 50 00 72 00 6F 00 76 00 69 00 64 00 65 00 72 30 82 02 C7
+          06 09 2A 86 48 86 F7 0D 01 07 06 A0 82 02 B8 30 82 02 B4 02 01 00 30 82 02 AD 06 09 2A 86 48 86
+          F7 0D 01 07 01 30 1C 06 0A 2A 86 48 86 F7 0D 01 0C 01 06 30 0E 04 08 1C 19 2A AB A4 91 36 4B 02
+          02 07 D0 80 82 02 80 0D D9 1B 7E 0F E5 8D 22 5D 70 47 AA 4E 45 9E D9 AB 86 3F 67 DE 89 6F 75 2C
+          5A 78 E8 F9 C6 D9 0B 75 56 80 14 BD C9 A8 9C FE E0 F1 F7 41 5D FD DE 83 43 BC D3 0E 20 28 A5 A9
+          42 A8 93 6C 7A B8 36 34 F0 88 7C C2 D6 B0 DF C8 07 2F 4A 00 B9 B4 98 F6 3F 5D 15 C9 E8 D2 05 A6
+          46 EC 9D 7A 23 90 4E 2F 5F 1A 25 11 1C 21 2E 32 62 10 D6 2C 28 07 4B 99 4F 70 2A B5 51 25 0F 9A
+          D3 13 17 E5 4F C9 89 94 DA A4 3B 41 75 F6 40 3C 51 DF 42 9B 60 DA 9F 1B E3 DF 50 3B AA 17 EC 5C
+          3B FC D4 B3 5B 8B 99 AB 96 42 FA B0 29 98 68 D3 C2 8C 66 FB D5 EE A8 82 1F CA 36 1A 27 B1 E7 15
+          A9 84 66 AE E6 F8 D2 B0 CF A2 68 E2 43 3C 7E D2 32 7B 38 6B 31 7B AE 35 9D 30 EA 6A F5 CC 9B 9C
+          D5 D7 E0 15 E9 60 B8 E4 C3 9D F2 72 E3 F7 96 32 72 D2 C3 14 80 EB 74 F0 29 B9 70 D4 21 93 D3 A1
+          81 30 0A DB 62 5C F0 A5 1D 10 BB C2 E1 AE AA 95 C0 41 0F 7F 93 CF EE 41 FE DD 2C 5C BC 6B 7D 53
+          01 0B 25 7F 48 40 86 98 3B E4 81 42 D3 BC 86 25 35 B1 D6 59 7F 52 7B 99 1A FF BA 85 FE 32 16 33
+          E5 B7 CB 4A D3 B5 9D CF 19 18 1F 5A 50 C2 44 A2 AA DF D5 FC 34 02 C2 75 DE C3 87 D6 24 CA E0 21
+          D2 D0 6C C7 0F 64 35 61 A0 97 92 45 1A 19 7C 15 DD 12 6C 4B 20 4D 53 65 B1 BD 8E 08 EB A9 0F 17
+          BA 4E 9B DA 2C F7 1C 95 17 1A 16 04 ED AF 76 82 29 B3 02 7D 30 0D 39 AC 7A A6 FB 2F F8 EA 7F C1
+          8D A9 A7 73 72 72 5C 9E EB 14 E3 A4 99 0E D7 A8 06 9D 3E 6B 2A 24 27 8B BC 21 62 92 3A 81 B5 4D
+          80 98 EA F8 05 CC 1D 63 F1 AB B6 17 F9 54 6B 08 5D 05 DB C3 84 6D 29 D1 65 D9 49 85 24 AF B7 C5
+          C2 5A 9D 7B 5A 85 8D 4D 87 3C 29 3A D3 EA A6 A1 5C 40 55 B9 60 23 80 ED 71 34 CC A1 DF 4E B0 CA
+          FD 19 F8 10 C5 B1 6E 69 48 F4 68 7D B3 3D 23 B7 83 6F 41 5A C0 05 64 2E EF AA 60 EB 8A 89 D9 0B
+          E4 CD D8 A4 E0 09 6A 9E 5E AF 66 FC 80 44 CC 2A 98 C1 DA 2F 07 9B F5 08 DF CF 69 A5 49 25 E4 60
+          B7 89 EC CC E0 89 30 A3 55 F0 1E 4B A4 85 81 D2 91 1D 61 CF 9D A0 DF 2E 9A 59 0E E3 FA 89 83 A5
+          E8 C5 53 02 D9 AE E1 26 63 AB 31 01 56 A9 2E 95 A6 8D 64 64 78 A6 9D 27 99 4E 57 A6 1A 76 92 BB
+          68 53 E3 AA E2 93 10 30 3B 30 1F 30 07 06 05 2B 0E 03 02 1A 04 14 49 80 40 BE 05 9A 29 20 C2 0A
+          5B 39 08 3F 65 CE 68 DF 83 1C 04 14 83 58 2C E6 07 61 6B EB 2A DA 3F 67 33 98 5F CB 96 28 66 CE
+          02 02 07 D0
+        ENDBINARY
+      ENDVISUALSTUDIOPROJECTFILE
+      
+      VISUALSTUDIOPROJECTFILE #EWSIntegrationClassLibrary.csproj
+        PROPERTIES
+          Name                #EWSIntegrationClassLibrary.csproj
+        ENDPROPERTIES
+        
+        SOURCE 3236
+#﻿<?xml version="1.0" encoding="utf-8"?>
+#<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+#  <PropertyGroup>
+#    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+#    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+#    <ProductVersion>8.0.30703</ProductVersion>
+#    <SchemaVersion>2.0</SchemaVersion>
+#    <ProjectGuid>{4EE6D0BC-7CF0-4C1C-A590-22750F1425E1}</ProjectGuid>
+#    <OutputType>Library</OutputType>
+#    <AppDesignerFolder>Properties</AppDesignerFolder>
+#    <RootNamespace>EWSIntegrationClassLibrary</RootNamespace>
+#    <AssemblyName>EWSIntegrationClassLibrary</AssemblyName>
+#    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+#    <FileAlignment>512</FileAlignment>
+#    <ProjectTypeGuids>{BF6F8E12-879D-49E7-ADF0-5503146B24B8};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+#    <DeployToServer>Yes</DeployToServer>
+#    <DeployToClient>Yes</DeployToClient>
+#    <DeployToEP>No</DeployToEP>
+#    <StartupElement />
+#    <DebugTarget>None</DebugTarget>
+#  </PropertyGroup>
+#  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+#    <DebugSymbols>true</DebugSymbols>
+#    <DebugType>full</DebugType>
+#    <Optimize>false</Optimize>
+#    <OutputPath>bin\Debug\</OutputPath>
+#    <DefineConstants>DEBUG;TRACE</DefineConstants>
+#    <ErrorReport>prompt</ErrorReport>
+#    <WarningLevel>4</WarningLevel>
+#  </PropertyGroup>
+#  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+#    <DebugType>pdbonly</DebugType>
+#    <Optimize>true</Optimize>
+#    <OutputPath>bin\Release\</OutputPath>
+#    <DefineConstants>TRACE</DefineConstants>
+#    <ErrorReport>prompt</ErrorReport>
+#    <WarningLevel>4</WarningLevel>
+#  </PropertyGroup>
+#  <PropertyGroup>
+#    <SignAssembly>true</SignAssembly>
+#  </PropertyGroup>
+#  <PropertyGroup>
+#    <AssemblyOriginatorKeyFile>EWSAssemblySignature.pfx</AssemblyOriginatorKeyFile>
+#  </PropertyGroup>
+#  <ItemGroup>
+#    <Reference Include="Microsoft.Exchange.WebServices">
+#      <HintPath>..\..\..\..\..\Desktop\Event Management\Microsoft.Exchange.WebServices.dll</HintPath>
+#    </Reference>
+#    <Reference Include="System" />
+#    <Reference Include="System.Core" />
+#    <Reference Include="System.Xml.Linq" />
+#    <Reference Include="System.Data.DataSetExtensions" />
+#    <Reference Include="Microsoft.CSharp" />
+#    <Reference Include="System.Data" />
+#    <Reference Include="System.Xml" />
+#  </ItemGroup>
+#  <ItemGroup>
+#    <Compile Include="Class1.cs" />
+#    <Compile Include="Properties\AssemblyInfo.cs" />
+#  </ItemGroup>
+#  <ItemGroup>
+#    <None Include="EWSAssemblySignature.pfx" />
+#  </ItemGroup>
+#  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+#  <Import Project="$(MSBuildExtensionsPath)\Microsoft\DynamicsTools\Microsoft.Dynamics.Framework.Design.InteractionProject.targets" />
+#  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+#       Other similar extension points exist, see Microsoft.Common.targets.
+#  <Target Name="BeforeBuild">
+#  </Target>
+#  <Target Name="AfterBuild">
+#  </Target>
+#  -->
+#</Project>
+        ENDSOURCE
+      ENDVISUALSTUDIOPROJECTFILE
+      
+    ENDVISUALSTUDIOPROJECTFOLDER
+    
+    VISUALSTUDIOPROJECTFOLDER #Project Output
+      PROPERTIES
+        Name                #Project Output
+      ENDPROPERTIES
+      
+    ENDVISUALSTUDIOPROJECTFOLDER
+    
+  ENDVISUALSTUDIOPROJECT
+  
+
+***Element: VPC
+
+; Microsoft Dynamics AX VISUALSTUDIOPROJECT : AsposeEmailClassLibrary unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  VISUALSTUDIOPROJECT #AsposeEmailClassLibrary
+    PROPERTIES
+      Name                #AsposeEmailClassLibrary
+      ProjectGUID         #{D5F7B2C2-893C-443E-8953-F136BF49D212}
+      ProjectTypeGUID     #{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
+      VisualStudioProjectFile   #AsposeEmailClassLibrary.csproj
+      DeployTo            #Server Client 
+      Origin              #{08D43183-151B-4EE1-9FEF-1A13D1CDCD20}
+    ENDPROPERTIES
+    
+    REFERENCEDPROJECTS
+      #
+    ENDREFERENCEDPROJECTS
+    
+    VISUALSTUDIOPROJECTFOLDER #Project Content
+      PROPERTIES
+        Name                #Project Content
+      ENDPROPERTIES
+      
+      VISUALSTUDIOPROJECTFOLDER #Properties
+        PROPERTIES
+          Name                #Properties
+        ENDPROPERTIES
+        
+        VISUALSTUDIOPROJECTFILE #AssemblyInfo.cs
+          PROPERTIES
+            Name                #AssemblyInfo.cs
+          ENDPROPERTIES
+          
+          SOURCE 1458
+#﻿using System.Reflection;
+#using System.Runtime.CompilerServices;
+#using System.Runtime.InteropServices;
+#
+#// General Information about an assembly is controlled through the following 
+#// set of attributes. Change these attribute values to modify the information
+#// associated with an assembly.
+#[assembly: AssemblyTitle("AsposeEmailClassLibrary")]
+#[assembly: AssemblyDescription("")]
+#[assembly: AssemblyConfiguration("")]
+#[assembly: AssemblyCompany("")]
+#[assembly: AssemblyProduct("AsposeEmailClassLibrary")]
+#[assembly: AssemblyCopyright("Copyright ©  2014")]
+#[assembly: AssemblyTrademark("")]
+#[assembly: AssemblyCulture("")]
+#
+#// Setting ComVisible to false makes the types in this assembly not visible 
+#// to COM components.  If you need to access a type in this assembly from 
+#// COM, set the ComVisible attribute to true on that type.
+#[assembly: ComVisible(false)]
+#
+#// The following GUID is for the ID of the typelib if this project is exposed to COM
+#[assembly: Guid("ef9ddd9d-464f-41b3-90cf-7b811622e392")]
+#
+#// Version information for an assembly consists of the following four values:
+#//
+#//      Major Version
+#//      Minor Version 
+#//      Build Number
+#//      Revision
+#//
+#// You can specify all the values or you can default the Build and Revision Numbers 
+#// by using the '*' as shown below:
+#// [assembly: AssemblyVersion("1.0.*")]
+#[assembly: AssemblyVersion("1.0.0.0")]
+#[assembly: AssemblyFileVersion("1.0.0.0")]
+          ENDSOURCE
+        ENDVISUALSTUDIOPROJECTFILE
+        
+      ENDVISUALSTUDIOPROJECTFOLDER
+      
+      VISUALSTUDIOPROJECTFILE #Aspose.pfx
+        PROPERTIES
+          Name                #Aspose.pfx
+          IsBinary            #Yes
+        ENDPROPERTIES
+        
+        BINARY 1764
+          30 82 06 E0 02 01 03 30 82 06 9C 06 09 2A 86 48 86 F7 0D 01 07 01 A0 82 06 8D 04 82 06 89 30 82
+          06 85 30 82 03 B6 06 09 2A 86 48 86 F7 0D 01 07 01 A0 82 03 A7 04 82 03 A3 30 82 03 9F 30 82 03
+          9B 06 0B 2A 86 48 86 F7 0D 01 0C 0A 01 02 A0 82 02 B6 30 82 02 B2 30 1C 06 0A 2A 86 48 86 F7 0D
+          01 0C 01 03 30 0E 04 08 B3 D7 A4 0E 02 81 48 F6 02 02 07 D0 04 82 02 90 87 11 A4 8D 08 D9 A9 F7
+          B2 5B 67 E8 3A 74 3F 46 FF B5 BB FF 0C 71 E9 6E 2A F2 85 1A 46 26 0F 5F 42 15 B6 0D 97 88 64 97
+          B1 EC 59 B0 59 2A 97 25 93 E1 3C 16 43 BE B0 0D 35 17 D7 EF A6 8E DF 20 A2 AA 5D 14 E8 7A 4B 99
+          37 04 D0 E4 8B 5A 7E 4E B2 90 25 56 81 49 E3 53 00 46 3E 90 DE 43 A7 47 C4 45 F8 8D 28 BD 18 00
+          0D 71 1F EA 67 0E 4A 69 94 47 2E 12 7D F3 46 A7 61 1A C2 EE E8 4E 33 2F 68 6D CC 7B 95 3B 77 BB
+          1C 99 44 84 93 E6 44 14 90 28 B2 82 10 FA 9D 0D 15 B8 D0 E1 67 8F 34 5B 4F E0 04 50 30 5F D2 BF
+          A3 82 87 E7 FC 30 FE AC 7B D2 38 A5 AB A8 C8 DC 36 6A 28 5E 0A A2 44 37 84 21 83 CA E6 C8 37 2A
+          A1 21 86 37 53 39 3E DA E5 A4 7F 56 66 A1 33 15 08 A1 2E EF 4F F8 01 07 1D 34 A4 72 BE F5 96 34
+          54 01 F5 DD 76 8F 64 64 8F 86 CF 19 46 7C 03 94 4D 7B 4D 3A B2 89 86 1E 58 C3 C8 BF CC 2C 81 94
+          9B BB C0 3E 89 D8 A2 8A DD F7 70 10 24 EE B9 12 90 49 D8 FA D9 4E 42 D3 C3 AB 85 5B EE 83 AC BE
+          B9 CD DC E4 3E 1D 9F 74 63 AB 3C 9D DD FA 1D 1F B8 92 D8 3B B1 FC 35 CA 3B 93 17 CC 84 74 C9 A5
+          80 B5 E2 8E 8B 2B 6F F4 77 C7 89 67 D0 3F 39 64 36 25 F6 B3 5E 4E 85 09 17 7E 18 B0 6F C6 A3 6B
+          BA CE 1D FB 57 07 09 A1 FA 57 D7 72 A0 F9 94 E2 DA A5 24 C9 F1 F3 A5 D8 33 83 74 8E 3B EA A5 C5
+          6C F6 DE 96 64 34 22 38 03 C9 AA 31 8E 3E 59 5B 8B C2 BD 0E 46 0F 59 85 A9 93 A6 CA 89 A5 C6 4C
+          C2 01 C0 BB 8F 14 27 A1 86 FF 97 4C 1A 53 8B E4 CE 14 E6 E8 E8 D8 90 9C CA 92 8D 3C 06 AE 27 60
+          A9 A3 EB A4 D2 B3 EE 13 B7 C6 BE F4 69 2F ED FD E0 71 F6 07 E1 98 53 A8 CA D6 2B 35 16 57 B4 3D
+          66 52 F3 5A 83 A7 8D 28 1A 58 95 3C 9F 5F 25 A5 7F 33 4B 4F F1 D2 F7 BD 2F 0F 04 E1 11 85 C4 B5
+          8D 8D 09 CA 1D 5E 6D B2 13 62 D2 08 3D 89 B9 59 36 CA 2F 7D 1E C1 8E 2F 68 6A 17 EF 53 AD F0 4A
+          31 DD 4A D9 59 89 31 A7 66 89 8F 74 3F AB C1 C2 C0 B1 5D ED 2C 06 1E 33 4C 7C D2 67 00 4B FF BF
+          AB ED 04 8E 0F C3 E8 74 42 83 34 30 3B 78 F5 56 F9 58 21 3E C4 31 37 BE 44 B6 2D C9 6D 68 B8 8A
+          70 35 D7 78 E9 87 D5 0C 43 73 86 76 58 CA E0 11 14 3A 8D 83 D4 12 DF 1C 88 C0 A5 76 54 31 87 0F
+          20 BA 53 F7 49 5C 12 F4 31 81 D1 30 13 06 09 2A 86 48 86 F7 0D 01 09 15 31 06 04 04 01 00 00 00
+          30 5B 06 09 2A 86 48 86 F7 0D 01 09 14 31 4E 1E 4C 00 7B 00 38 00 43 00 46 00 43 00 39 00 32 00
+          46 00 46 00 2D 00 44 00 45 00 43 00 33 00 2D 00 34 00 41 00 34 00 37 00 2D 00 42 00 36 00 43 00
+          41 00 2D 00 46 00 33 00 34 00 36 00 36 00 38 00 45 00 37 00 37 00 44 00 32 00 32 00 7D 30 5D 06
+          09 2B 06 01 04 01 82 37 11 01 31 50 1E 4E 00 4D 00 69 00 63 00 72 00 6F 00 73 00 6F 00 66 00 74
+          00 20 00 53 00 74 00 72 00 6F 00 6E 00 67 00 20 00 43 00 72 00 79 00 70 00 74 00 6F 00 67 00 72
+          00 61 00 70 00 68 00 69 00 63 00 20 00 50 00 72 00 6F 00 76 00 69 00 64 00 65 00 72 30 82 02 C7
+          06 09 2A 86 48 86 F7 0D 01 07 06 A0 82 02 B8 30 82 02 B4 02 01 00 30 82 02 AD 06 09 2A 86 48 86
+          F7 0D 01 07 01 30 1C 06 0A 2A 86 48 86 F7 0D 01 0C 01 06 30 0E 04 08 32 DF FC 55 3D 3E A7 D7 02
+          02 07 D0 80 82 02 80 F2 25 79 D4 70 1E 45 98 21 C7 1B 5F EB 00 F0 F9 5B D7 C5 76 8A 6D D3 41 82
+          C5 37 46 C2 14 65 EE 36 8B A2 A0 9A 81 CE 35 04 D4 78 A1 E0 3C ED 01 30 08 4F DC 30 26 D5 3D EA
+          33 02 02 BC B7 07 A2 FA FF AD E3 B7 F3 8C 63 E4 09 83 BE A8 AC CA 33 42 E7 5E 8C 41 4F A9 E3 01
+          E7 66 A9 A8 2C BB E7 78 83 ED CC B7 0C 6C 7F F9 28 40 5D 53 3F 94 F7 1D AA 61 E7 4A F6 28 D0 C0
+          E4 E1 24 18 08 01 CC 12 54 2F CA FD 9F E5 E3 02 DD CC BA A2 9E B7 BD 9A 39 4F 42 FD 76 2D 2E E9
+          8C AF 94 F6 45 2E 8B D8 03 FD 05 35 D7 C8 64 EB 95 C9 87 39 CD 93 AD 17 98 87 D5 69 8A AB 16 B3
+          9C 8B 02 1F 55 F5 34 C3 E6 1D DD 2E 26 D5 E4 90 31 18 91 3D BB D8 5B 41 83 45 65 CE 12 23 00 A2
+          DC D3 AD 65 B0 72 EE D3 97 31 59 E4 D0 57 B9 A5 CD 93 94 AD 76 73 5D E1 1D 9A E7 D4 77 8E F7 24
+          FC B5 8B AC 7A 0C 0D 8C C7 F6 93 AB AB A8 4F 32 21 E2 49 01 D3 5F 79 16 9F 86 DF 99 D8 F6 89 22
+          8F 16 A0 07 CC 77 E0 E9 10 3F 72 B9 2B 82 FC 75 5D 10 1F 25 E2 B9 08 14 83 7E B0 11 7F 8A 79 91
+          CE 04 7B 5A C2 6A D5 70 7B 07 89 02 4A 08 85 A0 F5 3C 75 89 A5 D4 F5 36 BB 81 90 5E EF C0 83 69
+          68 88 79 02 B4 42 AC 1D 6A D3 F1 02 85 CA E8 17 F0 44 0E 50 C1 5D A1 33 E9 B9 0A 22 AA 5E 41 7A
+          99 94 F2 EB D1 18 5E 3D 83 D4 3C B6 93 2C 0E AB 1D 20 8B 11 82 C0 F7 3D 03 E6 F8 C6 A5 4A D4 50
+          EA EF 69 57 5C EF DA 91 1D 49 45 28 6D A7 E5 9D 68 33 31 AC E1 26 92 68 2C 30 C3 DD F9 31 36 9C
+          A0 92 76 E5 FD D2 D7 BC 54 6C 63 ED C3 8F CC 61 C5 33 E7 1C 2A 1F 08 0F 3A FC D3 45 DF 38 CA 3C
+          A8 CF 10 E4 BA F7 E0 AD E1 04 44 97 5C 49 BC EF 93 EC 5E 39 8B 17 A8 17 8A DD 66 D1 6C 22 1B 64
+          83 A9 2F F9 12 06 C5 E2 89 4C 04 FA 94 15 9F 73 C2 8E 79 CF 5A D3 BC DE 72 9D 50 5D D9 49 C8 D1
+          DE 8A BF 87 A4 9E 8B 27 BD FC A9 83 F8 A1 01 84 45 98 2B 31 F4 9A 99 85 45 21 91 47 9C 34 CE 8B
+          41 8C C4 F4 73 D4 D7 78 3D 6D D5 14 6E DA 12 9A 42 21 92 1B 40 9D F9 5A 04 0F 5F 87 E9 F3 F4 9B
+          60 EE D6 6E 3F B5 28 DA 29 9C B2 DE 0A FF 96 F9 58 DD 05 FA 31 E7 B6 3B 26 17 79 50 67 88 5A 74
+          BB 89 CA 5E E3 15 43 30 3B 30 1F 30 07 06 05 2B 0E 03 02 1A 04 14 00 5C 07 51 5A 93 77 90 60 89
+          B9 73 8B E0 24 7B D7 7F 6D 96 04 14 D1 F1 A2 EB A4 2B 5E 3A 11 A7 1F BB 9E 1F 5C 77 86 38 38 9F
+          02 02 07 D0
+        ENDBINARY
+      ENDVISUALSTUDIOPROJECTFILE
+      
+      VISUALSTUDIOPROJECTFILE #AsposeEmailClassLibrary.csproj
+        PROPERTIES
+          Name                #AsposeEmailClassLibrary.csproj
+        ENDPROPERTIES
+        
+        SOURCE 3215
+#﻿<?xml version="1.0" encoding="utf-8"?>
+#<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+#  <PropertyGroup>
+#    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+#    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+#    <ProductVersion>8.0.30703</ProductVersion>
+#    <SchemaVersion>2.0</SchemaVersion>
+#    <ProjectGuid>{D5F7B2C2-893C-443E-8953-F136BF49D212}</ProjectGuid>
+#    <OutputType>Library</OutputType>
+#    <AppDesignerFolder>Properties</AppDesignerFolder>
+#    <RootNamespace>AsposeEmailClassLibrary</RootNamespace>
+#    <AssemblyName>AsposeEmailClassLibrary</AssemblyName>
+#    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+#    <FileAlignment>512</FileAlignment>
+#    <ProjectTypeGuids>{BF6F8E12-879D-49E7-ADF0-5503146B24B8};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+#    <DeployToServer>Yes</DeployToServer>
+#    <DeployToClient>Yes</DeployToClient>
+#    <DeployToEP>No</DeployToEP>
+#    <StartupElement />
+#    <DebugTarget>None</DebugTarget>
+#  </PropertyGroup>
+#  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+#    <DebugSymbols>true</DebugSymbols>
+#    <DebugType>full</DebugType>
+#    <Optimize>false</Optimize>
+#    <OutputPath>bin\Debug\</OutputPath>
+#    <DefineConstants>DEBUG;TRACE</DefineConstants>
+#    <ErrorReport>prompt</ErrorReport>
+#    <WarningLevel>4</WarningLevel>
+#  </PropertyGroup>
+#  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+#    <DebugType>pdbonly</DebugType>
+#    <Optimize>true</Optimize>
+#    <OutputPath>bin\Release\</OutputPath>
+#    <DefineConstants>TRACE</DefineConstants>
+#    <ErrorReport>prompt</ErrorReport>
+#    <WarningLevel>4</WarningLevel>
+#  </PropertyGroup>
+#  <PropertyGroup>
+#    <SignAssembly>true</SignAssembly>
+#  </PropertyGroup>
+#  <PropertyGroup>
+#    <AssemblyOriginatorKeyFile>Aspose.pfx</AssemblyOriginatorKeyFile>
+#  </PropertyGroup>
+#  <ItemGroup>
+#    <Reference Include="Aspose.Email">
+#      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Dynamics AX\60\Client\Bin\Aspose.Email.dll</HintPath>
+#    </Reference>
+#    <Reference Include="System" />
+#    <Reference Include="System.Core" />
+#    <Reference Include="System.Xml.Linq" />
+#    <Reference Include="System.Data.DataSetExtensions" />
+#    <Reference Include="Microsoft.CSharp" />
+#    <Reference Include="System.Data" />
+#    <Reference Include="System.Xml" />
+#  </ItemGroup>
+#  <ItemGroup>
+#    <Compile Include="OutlookIntegration.cs" />
+#    <Compile Include="Properties\AssemblyInfo.cs" />
+#  </ItemGroup>
+#  <ItemGroup>
+#    <None Include="Aspose.pfx" />
+#  </ItemGroup>
+#  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+#  <Import Project="$(MSBuildExtensionsPath)\Microsoft\DynamicsTools\Microsoft.Dynamics.Framework.Design.InteractionProject.targets" />
+#  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+#       Other similar extension points exist, see Microsoft.Common.targets.
+#  <Target Name="BeforeBuild">
+#  </Target>
+#  <Target Name="AfterBuild">
+#  </Target>
+#  -->
+#</Project>
+        ENDSOURCE
+      ENDVISUALSTUDIOPROJECTFILE
+      
+      VISUALSTUDIOPROJECTFILE #OutlookIntegration.cs
+        PROPERTIES
+          Name                #OutlookIntegration.cs
+        ENDPROPERTIES
+        
+        SOURCE 3113
+#﻿using System;
+#using System.Collections.Generic;
+#using System.ComponentModel;
+#using System.Data;
+#using System.Linq;
+#using System.Text;
+#using System.Threading.Tasks;
+#using System.Net;
+#using System.Net.Security;
+#using Aspose.Email;
+#using Aspose.Email.Mail;
+#using Aspose.Email.Exchange;
+#using Aspose.Email.Outlook;
+#
+#namespace AsposeEmailClassLibrary
+#{
+#    public class OutlookIntegration
+#    {
+#        IEWSClient client;
+#
+#        public void exchangeEWSClient(string _mailBoxUri, string _userName, string _password, string _domain = "")
+#        {
+#            string mailboxUri = _mailBoxUri;
+#            string domain = _domain;
+#            string username = _userName;
+#            string password = _password;
+#            NetworkCredential credentials = new NetworkCredential(username, password, domain);
+#            client = EWSClient.GetEWSClient(mailboxUri, credentials);
+#        }
+#
+#        public void sendVotingMail(string _from, string[] _address, string _subject, string _votingOptions, string _body = "")
+#        {
+#            MailMessage message = new MailMessage();
+#            MailAddressCollection mailAddressCollection = new MailAddressCollection();
+#            string votingOptions = "";
+#
+#            for (int i = 0; i < _address.Length; i++)
+#            {
+#                mailAddressCollection.Add(_address[i]);
+#            }
+#
+#
+#            votingOptions = _votingOptions;
+#
+#
+#            message.From = _from;
+#            message.To = mailAddressCollection;
+#            message.Subject = _subject;
+#            message.HtmlBody = _body;
+#            FollowUpOptions options = new FollowUpOptions();
+#            options.VotingButtons = votingOptions;
+#            options.DueDate = new DateTime(2014, 12, 22);
+#            client.Send(message, options);
+#        }
+#
+#        public string getVotingResponses(string _recipient, string _subject)
+#        {
+#            ExchangeQueryBuilder builder = new ExchangeQueryBuilder();
+#            // Subject contains "Newsletter"
+#            builder.Subject.Contains(_subject);
+#            MailQuery query = builder.GetQuery();
+#            // Call ListMessages method to list messages info from Inbox
+#            ExchangeMessageInfoCollection msgCollection = client.ListMessages(client.MailboxInfo.InboxUri, query, false);
+#
+#
+#            string subject = "";
+#            string[] response;
+#            // Loop through the collection to get Message URI
+#            foreach (ExchangeMessageInfo msgInfo in msgCollection)
+#            {
+#                string strMessageURI = msgInfo.UniqueUri;
+#
+#                MailAddress from;
+#
+#                // Now get the message details using FetchMessage()
+#                MailMessage msg = client.FetchMessage(strMessageURI);
+#
+#                from = msg.From;
+#                if (from.Address == _recipient)
+#                {
+#                    subject = msg.Subject;
+#                    response = subject.Split(':');
+#                    return response[0];
+#                }
+#            }
+#            return "Unknown";
+#        }
+#    }
+#}
+        ENDSOURCE
+      ENDVISUALSTUDIOPROJECTFILE
+      
+    ENDVISUALSTUDIOPROJECTFOLDER
+    
+    VISUALSTUDIOPROJECTFOLDER #Project Output
+      PROPERTIES
+        Name                #Project Output
+      ENDPROPERTIES
+      
+    ENDVISUALSTUDIOPROJECTFOLDER
+    
+  ENDVISUALSTUDIOPROJECT
+  
+
+***Element: PRN
+
+; Microsoft Dynamics AX Project : FthAXOutlookIntegration unloaded
+; --------------------------------------------------------------------------------
+  PROJECTVERSION 2
+  
+  PROJECT #FthAXOutlookIntegration
+  SHARED
+  PROPERTIES
+    Name                #FthAXOutlookIntegration
+    Origin              #{AA530979-4215-495E-A424-11993A61CEA9}
+  ENDPROPERTIES
+  
+    PROJECTCLASS ProjectNode
+    GROUP #Tables
+      PROPERTIES
+        Name                #Tables
+        ProjectGroupType    #Tables
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 44
+        UTILOBJECTID 722
+        NODETYPE 204
+        NAME #SysEmailSMTPPassword
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 44
+        UTILOBJECTID 213
+        NODETYPE 204
+        NAME #SysOutgoingEmailTable
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 44
+        UTILOBJECTID 1686
+        NODETYPE 204
+        NAME #SysEmailParameters
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #BaseEnums
+      PROPERTIES
+        Name                #BaseEnums
+        ProjectGroupType    #BaseEnums
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 40
+        UTILOBJECTID 101425
+        NODETYPE 209
+        NAME #EmailConfirmation
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #Forms
+      PROPERTIES
+        Name                #Forms
+        ProjectGroupType    #Forms
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 11
+        UTILOBJECTID 0
+        NODETYPE 201
+        NAME #SysEmailParameters
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 11
+        UTILOBJECTID 0
+        NODETYPE 201
+        NAME #SysOutgoingEmailTable
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #Classes
+      PROPERTIES
+        Name                #Classes
+        ProjectGroupType    #Classes
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 1024643
+        NODETYPE 329
+        NAME #FthWorkflow2Outlook
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 45
+        UTILOBJECTID 1024644
+        NODETYPE 329
+        NAME #FthWorkflow2OutlookDataContract
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #References
+      PROPERTIES
+        Name                #References
+        ProjectGroupType    #References
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 53
+        UTILOBJECTID 0
+        NODETYPE 822
+        NAME #Microsoft.Exchange.WebServices
+      ENDNODE
+      BEGINNODE
+        FILETYPE 0
+        UTILTYPE 53
+        UTILOBJECTID 0
+        NODETYPE 822
+        NAME #Aspose.Email
+      ENDNODE
+      ENDGROUP
+      
+    GROUP #VisualStudioProjects
+      PROPERTIES
+        Name                #VisualStudioProjects
+        ProjectGroupType    #VisualStudioProjects
+        GroupMask           #
+        PreventEditProperties #No
+      ENDPROPERTIES
+      
+      GROUP #VisualStudioCSharpProjects
+        PROPERTIES
+          Name                #VisualStudioCSharpProjects
+          ProjectGroupType    #VisualStudioCSharpProjects
+          GroupMask           #
+          PreventEditProperties #No
+        ENDPROPERTIES
+        
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 128
+          UTILOBJECTID 0
+          NODETYPE 1531
+          NAME #EWSIntegrationClassLibrary
+        ENDNODE
+        BEGINNODE
+          FILETYPE 0
+          UTILTYPE 128
+          UTILOBJECTID 0
+          NODETYPE 1531
+          NAME #AsposeEmailClassLibrary
+        ENDNODE
+        ENDGROUP
+        
+      ENDGROUP
+      
+  ENDPROJECT
+  
+
+***Element: END
