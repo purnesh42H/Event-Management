@@ -6,7 +6,7 @@ Event Management Vertical for Microsoft Dynamics AX 2012. See [Dataflow](Project
 
 2) It provides the features to schedule, organize and run invitation and approval workflows within AX 2012.
 
-3) Go through the documents under "project documents" directory.
+3) Go through the documents under [project documents](Project%20documents) directory.
 
 4) It also sends outlook calendar invites as a step in workflow and posts event details on facebook and twitter, after workflow approval
 
