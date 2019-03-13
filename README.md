@@ -1,5 +1,5 @@
 # Event-Management
-Event Management Vertical for Microsoft Dynamics AX 2012. See [dataflow](Project%20documents/Data%20Flow%20Diagram.pdf) and [process](Project%20documents/Event%20Process%20Diagram.pdf)
+Event Management Vertical for Microsoft Dynamics AX 2012. See [Dataflow](Project%20documents/Data%20Flow%20Diagram.pdf) and [Process](Project%20documents/Event%20Process%20Diagram.pdf)
 
 # Important
 1) This is a vertical solution protype for Microsoft Dynamics AX 2012.
